@@ -1,0 +1,327 @@
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  background: var(--surface-ground);
+}
+
+.profile-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600) 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  .profile-info {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+
+      i {
+        font-size: 2rem;
+        color: white;
+      }
+    }
+
+    .user-details {
+      h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+      }
+
+      .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin: 0;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}
+
+.profile-content {
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+}
+
+:host ::ng-deep .profile-card {
+  .p-card-header {
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--surface-border);
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .p-card-body {
+    padding: 0;
+  }
+
+  .p-card-content {
+    padding: 1.5rem;
+  }
+}
+
+.info-section {
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      font-weight: 500;
+      color: var(--text-color-secondary);
+      font-size: 0.9rem;
+    }
+
+    .info-value {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      background: var(--surface-ground);
+      border-radius: 6px;
+      border: 1px solid var(--surface-border);
+
+      span {
+        color: var(--text-color);
+        font-weight: 500;
+      }
+
+      .role-display {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+.security-section, .actions-section {
+  .security-item, .action-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: var(--surface-card);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .security-info, .action-info {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 0.25rem 0;
+        color: var(--text-color);
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Dialog Styles
+.dialog-content {
+  padding: 0;
+
+  .field {
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+
+    .p-input-icon-left {
+      width: 100%;
+
+      i {
+        color: var(--text-color-secondary);
+      }
+
+      input, .p-password {
+        width: 100%;
+      }
+    }
+
+    .p-error {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem 0 0 0;
+  border-top: 1px solid var(--surface-border);
+}
+
+// Form validation styles
+:host ::ng-deep {
+  .ng-invalid.ng-touched {
+    .p-inputtext,
+    .p-password input {
+      border-color: var(--red-500);
+    }
+  }
+
+  .p-password {
+    width: 100%;
+
+    .p-password-input {
+      width: 100%;
+    }
+  }
+
+  .p-input-icon-left > .p-password {
+    padding-left: 2.5rem;
+
+    .p-password-input {
+      padding-left: 0;
+    }
+  }
+
+  .p-dialog-header {
+    font-weight: 600;
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .p-dialog-footer {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-header {
+    padding: 1.5rem;
+
+    .profile-info {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+
+      .avatar {
+        width: 60px;
+        height: 60px;
+
+        i {
+          font-size: 1.5rem;
+        }
+      }
+
+      .user-details {
+        h2 {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .security-item, .action-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .p-button {
+      width: 100%;
+    }
+  }
+
+  .dialog-actions {
+    flex-direction: column;
+
+    .p-button {
+      width: 100%;
+    }
+  }
+
+  :host ::ng-deep .p-dialog {
+    margin: 1rem;
+    width: calc(100vw - 2rem) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 0.5rem;
+  }
+
+  .profile-header {
+    padding: 1rem;
+  }
+
+  :host ::ng-deep .profile-card .p-card-content {
+    padding: 1rem;
+  }
+}

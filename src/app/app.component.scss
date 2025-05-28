@@ -1,0 +1,61 @@
+/* app.component.css */
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--surface-a);
+}
+
+.logo .app-title {
+  font-size: 1.25rem;
+  margin-left: 0.5rem;
+}
+
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  background-color: var(--surface-b);
+}
+
+.sidebar-open {
+  width: 16rem; /* adjust as needed */
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* PrimeNG menu overrides */
+.p-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.p-menuitem {
+  margin-bottom: 0.5rem;
+}
+.p-menuitem-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+}
+.p-menuitem-icon {
+  margin-right: 0.5rem;
+}

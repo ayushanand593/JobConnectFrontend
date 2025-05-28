@@ -1,0 +1,28 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <span class="navbar-logo">JobConnect</span>
+    </div>
+    <div class="navbar-menu">
+      <a href="#" class="navbar-item active">Jobs</a>
+      <a href="#" class="navbar-item">Companies</a>
+      <a href="#" class="navbar-item">Resources</a>
+    </div>
+    <div class="navbar-actions">
+      <ng-container *ngIf="!isAuthenticated; else loggedIn">
+        <a href="#" class="navbar-link">For Employers</a>
+        <a class="navbar-button outline" routerLink="/login">Log in</a>
+        <a href="#" class="navbar-button primary">Sign up</a>
+      </ng-container>
+      <ng-template #loggedIn>
+        <span class="navbar-welcome">Welcome {{currentUser?.role}}</span>
+      </ng-template>
+    </div>
+    <div class="navbar-mobile-menu">
+      <button type="button" class="navbar-toggle">
+        <span class="sr-only">Open main menu</span>
+        <i class="pi pi-bars"></i>
+      </button>
+    </div>
+  </div>
+</nav>

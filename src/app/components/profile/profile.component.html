@@ -1,0 +1,275 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="profile-info">
+      <div class="avatar">
+        <i class="pi pi-user"></i>
+      </div>
+      <div class="user-details" *ngIf="currentUser">
+        <h2>{{ currentUser.email }}</h2>
+        <p class="role-badge">
+          <i class="pi pi-shield"></i>
+          {{ currentUser.role }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-content">
+    <div class="profile-grid">
+      
+      <!-- Account Information Card -->
+      <p-card header="Account Information" styleClass="profile-card">
+        <div class="info-section">
+          <div class="info-item">
+            <label>Email Address</label>
+            <div class="info-value">
+              <span>{{ currentUser?.email }}</span>
+              <p-button 
+                icon="pi pi-pencil" 
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                (click)="openEmailDialog()"
+                pTooltip="Update Email"
+              ></p-button>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <label>Role</label>
+            <div class="info-value">
+              <span class="role-display">{{ currentUser?.role }}</span>
+            </div>
+          </div>
+          
+          <div class="info-item" *ngIf="currentUser?.companyID">
+            <label>Company ID</label>
+            <div class="info-value">
+              <span>{{ currentUser?.companyID }}</span>
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Security Settings Card -->
+      <p-card header="Security Settings" styleClass="profile-card">
+        <div class="security-section">
+          <div class="security-item">
+            <div class="security-info">
+              <h4>Password</h4>
+              <p>Update your password to keep your account secure</p>
+            </div>
+            <p-button 
+              label="Change Password"
+              icon="pi pi-key"
+              severity="secondary"
+              [outlined]="true"
+              (click)="openPasswordDialog()"
+            ></p-button>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Account Actions Card -->
+      <p-card header="Account Actions" styleClass="profile-card">
+        <div class="actions-section">
+          <div class="action-item">
+            <div class="action-info">
+              <h4>Logout</h4>
+              <p>Sign out of your account on this device</p>
+            </div>
+            <p-button 
+              label="Logout"
+              icon="pi pi-sign-out"
+              severity="danger"
+              [outlined]="true"
+              (click)="confirmLogout()"
+            ></p-button>
+          </div>
+        </div>
+      </p-card>
+
+    </div>
+  </div>
+</div>
+
+<!-- Email Update Dialog -->
+<p-dialog 
+  header="Update Email Address" 
+  [modal]="true" 
+  [(visible)]="showEmailDialog"
+  [style]="{ width: '90vw', maxWidth: '450px' }"
+  [closable]="!emailLoading"
+>
+  <form [formGroup]="emailForm" (ngSubmit)="updateEmail()">
+    <div class="dialog-content">
+      <div class="field">
+        <label for="currentPasswordEmail">Current Password</label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-lock"></i>
+          <p-password 
+            id="currentPasswordEmail"
+            formControlName="currentPassword"
+            placeholder="Enter current password"
+            [class.ng-invalid]="isFieldInvalid(emailForm, 'currentPassword')"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="false"
+            [toggleMask]="true"
+          ></p-password>
+        </span>
+        <small 
+          class="p-error" 
+          *ngIf="isFieldInvalid(emailForm, 'currentPassword')"
+        >
+          {{ getFieldError(emailForm, 'currentPassword') }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="newEmail">New Email Address</label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-envelope"></i>
+          <input 
+            id="newEmail"
+            type="email" 
+            pInputText 
+            formControlName="newEmail"
+            placeholder="Enter new email address"
+            [class.ng-invalid]="isFieldInvalid(emailForm, 'newEmail')"
+            class="w-full"
+          />
+        </span>
+        <small 
+          class="p-error" 
+          *ngIf="isFieldInvalid(emailForm, 'newEmail')"
+        >
+          {{ getFieldError(emailForm, 'newEmail') }}
+        </small>
+      </div>
+    </div>
+  </form>
+  
+  <ng-template pTemplate="footer">
+    <div class="dialog-actions">
+      <p-button 
+        label="Cancel" 
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (click)="showEmailDialog = false"
+        [disabled]="emailLoading"
+      ></p-button>
+      <p-button 
+        label="Update Email" 
+        icon="pi pi-check"
+        (click)="updateEmail()"
+        [loading]="emailLoading"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Password Update Dialog -->
+<p-dialog 
+  header="Change Password" 
+  [modal]="true" 
+  [(visible)]="showPasswordDialog"
+  [style]="{ width: '90vw', maxWidth: '450px' }"
+  [closable]="!passwordLoading"
+>
+  <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+    <div class="dialog-content">
+      <div class="field">
+        <label for="currentPasswordChange">Current Password</label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-lock"></i>
+          <p-password 
+            id="currentPasswordChange"
+            formControlName="currentPassword"
+            placeholder="Enter current password"
+            [class.ng-invalid]="isFieldInvalid(passwordForm, 'currentPassword')"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="false"
+            [toggleMask]="true"
+          ></p-password>
+        </span>
+        <small 
+          class="p-error" 
+          *ngIf="isFieldInvalid(passwordForm, 'currentPassword')"
+        >
+          {{ getFieldError(passwordForm, 'currentPassword') }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="newPassword">New Password</label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-key"></i>
+          <p-password 
+            id="newPassword"
+            formControlName="newPassword"
+            placeholder="Enter new password"
+            [class.ng-invalid]="isFieldInvalid(passwordForm, 'newPassword')"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="true"
+            [toggleMask]="true"
+          ></p-password>
+        </span>
+        <small 
+          class="p-error" 
+          *ngIf="isFieldInvalid(passwordForm, 'newPassword')"
+        >
+          {{ getFieldError(passwordForm, 'newPassword') }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="confirmPassword">Confirm New Password</label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-key"></i>
+          <p-password 
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            placeholder="Confirm new password"
+            [class.ng-invalid]="isFieldInvalid(passwordForm, 'confirmPassword')"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="false"
+            [toggleMask]="true"
+          ></p-password>
+        </span>
+        <small 
+          class="p-error" 
+          *ngIf="isFieldInvalid(passwordForm, 'confirmPassword')"
+        >
+          {{ getFieldError(passwordForm, 'confirmPassword') }}
+        </small>
+      </div>
+    </div>
+  </form>
+  
+  <ng-template pTemplate="footer">
+    <div class="dialog-actions">
+      <p-button 
+        label="Cancel" 
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (click)="showPasswordDialog = false"
+        [disabled]="passwordLoading"
+      ></p-button>
+      <p-button 
+        label="Update Password" 
+        icon="pi pi-check"
+        (click)="updatePassword()"
+        [loading]="passwordLoading"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog></p-confirmDialog>

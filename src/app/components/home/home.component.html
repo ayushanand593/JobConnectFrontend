@@ -1,0 +1,117 @@
+<div class="search-container">
+  <div class="search-hero">
+    <h1 class="search-title">Find Your Dream Job Today</h1>
+    <div class="search-form">
+      <form>
+        <div class="search-fields">
+          <div class="search-field">
+            <i class="pi pi-search"></i>
+            <input type="text" placeholder="Job title or keyword">
+          </div>
+          <div class="search-field">
+            <i class="pi pi-map-marker"></i>
+            <input type="text" placeholder="Location">
+          </div>
+          <button type="submit" class="search-button">Search Jobs</button>
+        </div>
+        <div class="advanced-search">
+          <button type="button" class="advanced-search-toggle">
+            Advanced Search
+            <i class="pi pi-chevron-down"></i>
+          </button>
+          <div class="advanced-search-options">
+            <div class="advanced-search-field">
+              <label>Job Type</label>
+              <select>
+                <option value="">All Job Types</option>
+                <option value="FULL_TIME">Full Time</option>
+                <option value="PART_TIME">Part Time</option>
+                <option value="CONTRACT">Contract</option>
+                <option value="INTERNSHIP">Internship</option>
+                <option value="REMOTE">Remote</option>
+              </select>
+            </div>
+            <div class="advanced-search-field">
+              <label>Experience Level</label>
+              <select>
+                <option value="">All Experience Levels</option>
+                <option value="entry">Entry Level (0-2 years)</option>
+                <option value="mid">Mid Level (3-5 years)</option>
+                <option value="senior">Senior Level (6+ years)</option>
+              </select>
+            </div>
+            <div class="advanced-search-field">
+              <label>Skills</label>
+              <input type="text" placeholder="Add skills...">
+              <div class="skills-tags">
+                <span class="skill-tag">Angular <i class="pi pi-times"></i></span>
+                <span class="skill-tag">JavaScript <i class="pi pi-times"></i></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="job-results">
+  <div class="job-results-header">
+    <h2 class="job-results-title">1,245 Jobs Found</h2>
+    <div class="job-results-sort">
+      <span>Sort by:</span>
+      <select>
+        <option>Most Relevant</option>
+        <option>Newest</option>
+        <option>Highest Paying</option>
+      </select>
+    </div>
+  </div>
+  <div class="job-cards">
+    <div class="job-card">
+      <div class="job-card-content">
+        <div class="job-card-header">
+          <div class="company-logo">TC</div>
+          <div class="job-info">
+            <h3 class="job-title">Senior Frontend Developer</h3>
+            <p class="company-name">TechCorp Inc.</p>
+          </div>
+        </div>
+        <div class="job-details">
+          <div class="job-location"><i class="pi pi-map-marker"></i> San Francisco, CA (Remote)</div>
+          <div class="job-type"><i class="pi pi-briefcase"></i> Full Time • <i class="pi pi-graduation-cap"></i> Senior Level (6+ years)</div>
+          <div class="job-skills">
+            <span class="skill-tag">Angular</span>
+            <span class="skill-tag">TypeScript</span>
+            <span class="skill-tag">JavaScript</span>
+          </div>
+          <p class="job-description">We're looking for a talented frontend developer...</p>
+        </div>
+      </div>
+      <div class="job-card-actions">
+        <span class="job-salary">$120K - $150K</span>
+        <span class="job-posted">Posted 2 days ago</span>
+        <button class="apply-button">Apply Now</button>
+      </div>
+    </div>
+    <!-- Add more job cards as needed -->
+  </div>
+  <div class="pagination">
+    <button class="pagination-button"><i class="pi pi-chevron-left"></i></button>
+    <button class="pagination-button active">1</button>
+    <button class="pagination-button">2</button>
+    <button class="pagination-button">3</button>
+    <span class="pagination-ellipsis">...</span>
+    <button class="pagination-button">10</button>
+    <button class="pagination-button"><i class="pi pi-chevron-right"></i></button>
+  </div>
+</div>
+
+<div class="newsletter">
+  <h2 class="newsletter-title">Get Job Alerts Delivered to Your Inbox</h2>
+  <p class="newsletter-description">Stay updated with the latest job opportunities...</p>
+  <div class="newsletter-form">
+    <input type="email" placeholder="Enter your email address">
+    <button class="subscribe-button">Subscribe</button>
+  </div>
+</div>

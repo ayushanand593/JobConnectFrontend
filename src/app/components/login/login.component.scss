@@ -1,0 +1,265 @@
+@import "../../../styles";
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-text) 100%);
+  padding: 1rem;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="white" stop-opacity="0.1"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/><circle cx="900" cy="800" r="80" fill="url(%23a)"/></svg>') no-repeat center center;
+    background-size: cover;
+    opacity: 0.3;
+  }
+}
+
+.login-card {
+  background: var(--surface-card);
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+
+.login-header {
+  padding: 2rem 2rem 1rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-bottom: 1px solid var(--surface-border);
+
+  .logo-section {
+    h1 {
+      margin: 0.5rem 0 0.25rem 0;
+      color: var(--text-color);
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-color-secondary);
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.login-form {
+  padding: 2rem;
+
+  .field {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+
+    .p-input-icon-left {
+      width: 100%;
+
+      i {
+        color: var(--text-color-secondary);
+      }
+
+      input, .p-password {
+        width: 100%;
+      }
+    }
+
+    .p-error {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+    }
+
+    .p-button {
+      font-weight: 500;
+      letter-spacing: 0.025em;
+    }
+  }
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--surface-border);
+
+  .forgot-password {
+    margin-bottom: 1rem;
+
+    a {
+      text-decoration: none;
+      font-size: 0.9rem;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .register-link {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary);
+
+    a {
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Terms Dialog Styles
+:host ::ng-deep .terms-dialog {
+  .p-dialog-header {
+    background: var(--primary-color);
+    color: white;
+    
+    .p-dialog-title {
+      font-weight: 600;
+    }
+  }
+
+  .p-dialog-content {
+    padding: 0;
+  }
+
+  .p-dialog-footer {
+    padding: 0;
+  }
+}
+
+.terms-content {
+  padding: 2rem;
+  text-align: center;
+
+  .terms-icon {
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    color: var(--text-color-secondary);
+    line-height: 1.6;
+  }
+
+  .terms-text {
+    background: var(--surface-ground);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    text-align: left;
+
+    p {
+      margin: 0 0 0.5rem 0;
+      font-weight: 500;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.2rem;
+
+      li {
+        margin-bottom: 0.5rem;
+        color: var(--text-color-secondary);
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+.terms-actions {
+  padding: 1.5rem 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  background: var(--surface-ground);
+  border-top: 1px solid var(--surface-border);
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .login-container {
+    padding: 0.5rem;
+  }
+
+  .login-card {
+    max-width: none;
+    margin: 0.5rem;
+  }
+
+  .login-header,
+  .login-form {
+    padding: 1.5rem;
+  }
+
+  .terms-content {
+    padding: 1.5rem;
+  }
+
+  .terms-actions {
+    padding: 1rem 1.5rem;
+    flex-direction: column;
+
+    .p-button {
+      width: 100%;
+    }
+  }
+}
+
+// Form validation styles
+:host ::ng-deep {
+  .ng-invalid.ng-touched {
+    .p-inputtext,
+    .p-password input {
+      border-color: var(--red-500);
+    }
+  }
+
+  .p-password {
+    width: 100%;
+
+    .p-password-input {
+      width: 100%;
+    }
+  }
+
+  .p-input-icon-left > .p-password {
+    padding-left: 2.5rem;
+
+    .p-password-input {
+      padding-left: 0;
+    }
+  }
+}
+
+// Loading state
+.p-button.p-button-loading {
+  pointer-events: none;
+}

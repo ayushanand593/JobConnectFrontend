@@ -1,0 +1,149 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo-section">
+        <i class="pi pi-shield" style="font-size: 3rem; color: var(--primary-color);"></i>
+        <h1>Welcome Back</h1>
+        <p>Sign in to your account</p>
+      </div>
+    </div>
+
+    <div class="login-form">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="field">
+          <label for="email">Email</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-envelope"></i>
+            <input 
+              id="email"
+              type="email" 
+              pInputText 
+              formControlName="email"
+              placeholder="Enter your email"
+              [class.ng-invalid]="isFieldInvalid('email')"
+              class="w-full"
+            />
+          </span>
+          <small 
+            class="p-error" 
+            *ngIf="isFieldInvalid('email')"
+          >
+            {{ getFieldError('email') }}
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-lock"></i>
+            <p-password 
+              id="password"
+              formControlName="password"
+              placeholder="Enter your password"
+              [class.ng-invalid]="isFieldInvalid('password')"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              [feedback]="false"
+              [toggleMask]="true"
+            ></p-password>
+          </span>
+          <small 
+            class="p-error" 
+            *ngIf="isFieldInvalid('password')"
+          >
+            {{ getFieldError('password') }}
+          </small>
+        </div>
+
+         <div class="field">
+    <p-checkbox 
+      formControlName="termsAccepted" 
+      [binary]="true"
+      >
+    </p-checkbox>
+    <label for="termsAccepted">I accept the Terms and Conditions</label>
+    <small 
+      class="p-error" 
+      *ngIf="loginForm.controls['termsAccepted'].invalid && loginForm.controls['termsAccepted'].touched">
+      You must accept the Terms and Conditions.
+    </small>
+  </div>
+
+        <div class="field">
+          <p-button 
+            type="submit"
+            label="Sign In"
+            icon="pi pi-sign-in"
+            [loading]="loading"
+            styleClass="w-full"
+            size="large"
+          ></p-button>
+        </div>
+      </form>
+
+      <div class="login-footer">
+        <div class="forgot-password">
+          <a href="#" class="text-primary">Forgot your password?</a>
+        </div>
+        <div class="register-link">
+          <span>Don't have an account? </span>
+          <a routerLink="/register" class="text-primary font-semibold">Sign up</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms and Conditions Dialog -->
+  <p-dialog 
+    header="Terms and Conditions" 
+    [modal]="true" 
+    [closable]="false"
+    [draggable]="false"
+    [resizable]="false"
+    [(visible)]="showTermsDialog"
+    styleClass="terms-dialog"
+    [style]="{ width: '90vw', maxWidth: '600px' }"
+  >
+    <div class="terms-content">
+      <div class="terms-icon">
+        <i class="pi pi-info-circle" style="font-size: 2.5rem; color: var(--blue-500);"></i>
+      </div>
+      
+      <h3>Accept Terms and Conditions</h3>
+      <p>
+        To continue using our application, you must accept our terms and conditions. 
+        This is a one-time requirement for new users.
+      </p>
+      
+      <div class="terms-text">
+        <p><strong>By accepting, you agree to:</strong></p>
+        <ul>
+          <li>Use the application in accordance with our guidelines</li>
+          <li>Protect your account credentials</li>
+          <li>Comply with applicable laws and regulations</li>
+          <li>Allow us to process your data as described in our privacy policy</li>
+        </ul>
+      </div>
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <div class="terms-actions">
+        <p-button 
+          label="Decline" 
+          icon="pi pi-times"
+          severity="secondary"
+          (click)="onRejectTerms()"
+          [outlined]="true"
+        ></p-button>
+        <p-button 
+          label="Accept & Continue" 
+          icon="pi pi-check"
+          (click)="onAcceptTerms()"
+          [loading]="loading"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<p-toast position="top-right"></p-toast>
