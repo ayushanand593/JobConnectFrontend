@@ -1,0 +1,42 @@
+.registration-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+}
+
+.surface-card {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+:host ::ng-deep .p-password input {
+  width: 100%;
+}
+
+:host ::ng-deep .p-inputnumber input {
+  width: 100%;
+}
+
+:host ::ng-deep .p-autocomplete input {
+  width: 100%;
+}
+
+:host ::ng-deep .p-chip-primary {
+  background-color: var(--primary-color);
+  color: var(--primary-color-text);
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+.text-blue-500 {
+  color: #3b82f6;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

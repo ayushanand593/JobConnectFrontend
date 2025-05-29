@@ -12,7 +12,7 @@ import { PasswordUpdateRequest } from '../interfaces/PasswordUpdateRequest';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/api/auth'; // Adjust based on your backend URL
+  private readonly API_URL = 'http://localhost:8080/api/auth';
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
 
@@ -27,7 +27,7 @@ export class AuthService {
     private router: Router
   ) {}
 
-  login(loginRequest: LoginRequest): Observable<JwtResponse> {
+    login(loginRequest: LoginRequest): Observable<JwtResponse> {
     return this.http.post<JwtResponse>(`${this.API_URL}/login`, loginRequest)
       .pipe(
         tap(response => {
@@ -39,37 +39,83 @@ export class AuthService {
       );
   }
 
-  logout(): void {
+   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
-  updateEmail(emailUpdate: EmailUpdateRequest): Observable<any> {
-    return this.http.put(`${this.API_URL}/update-email`, emailUpdate)
-      .pipe(
-        tap(() => {
-          // Update the stored user email
-          const currentUser = this.getCurrentUser();
-          if (currentUser) {
-            currentUser.email = emailUpdate.newEmail;
-            localStorage.setItem(this.USER_KEY, JSON.stringify(currentUser));
-            this.currentUserSubject.next(currentUser);
+  
+
+updateEmail(emailUpdate: EmailUpdateRequest): Observable<any> {
+  return this.http
+    .put(`${this.API_URL}/update-email`, emailUpdate, { 
+      responseType: 'text' 
+    })
+    .pipe(
+      tap((response) => {
+        // Update the stored user email only after successful response
+        const currentUser = this.getCurrentUser();
+        if (currentUser) {
+          currentUser.email = emailUpdate.newEmail;
+          localStorage.setItem(this.USER_KEY, JSON.stringify(currentUser));
+          this.currentUserSubject.next({ ...currentUser }); // spread to ensure change detection
+        }
+      }),
+      catchError((err: HttpErrorResponse) => {
+        console.error('UpdateEmail error:', err);
+        
+        // Extract error message from different possible response structures
+        let errorMessage = 'Failed to update email';
+        
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            errorMessage = err.error;
+          } else if (err.error.message) {
+            errorMessage = err.error.message;
+          } else if (err.error.error) {
+            errorMessage = err.error.error;
           }
-        }),
-        catchError(this.handleError)
-      );
-  }
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        return throwError(() => errorMessage);
+      })
+    );
+}
 
-  updatePassword(passwordUpdate: PasswordUpdateRequest): Observable<any> {
-    return this.http.put(`${this.API_URL}/update-password`, passwordUpdate)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
 
+updatePassword(passwordUpdate: PasswordUpdateRequest): Observable<any> {
+  return this.http
+    .put(`${this.API_URL}/update-password`, passwordUpdate, { 
+      responseType: 'text' 
+    })
+    .pipe(
+      catchError((err: HttpErrorResponse) => {
+        console.error('UpdatePassword error:', err);
+        
+        // Extract error message from different possible response structures
+        let errorMessage = 'Failed to update password';
+        
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            errorMessage = err.error;
+          } else if (err.error.message) {
+            errorMessage = err.error.message;
+          } else if (err.error.error) {
+            errorMessage = err.error.error;
+          }
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        return throwError(() => errorMessage);
+      })
+    );
+}
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
@@ -92,7 +138,8 @@ export class AuthService {
     return user ? roles.includes(user.role) : false;
   }
 
-  private setSession(token: string, user: User): void {
+  // Public method for registration service to access
+  public setSession(token: string, user: User): void {
     localStorage.setItem(this.TOKEN_KEY, token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     this.currentUserSubject.next(user);
@@ -121,7 +168,7 @@ export class AuthService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = error.error.message;
@@ -133,7 +180,7 @@ export class AuthService {
         errorMessage = error.message;
       }
     }
-    
+
     return throwError(() => errorMessage);
   }
 }

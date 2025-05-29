@@ -1,0 +1,300 @@
+<div class="registration-container">
+  <div class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
+    <div class="text-center mb-5">
+      <div class="text-900 text-3xl font-medium mb-3">Join as a Candidate</div>
+      <span class="text-600 font-medium line-height-3">
+        Create your profile and start your job search journey
+      </span>
+    </div>
+
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <!-- Email and Password Section -->
+      <div class="grid">
+        <div class="col-12">
+          <label for="email" class="block text-900 font-medium mb-2">
+            Email Address <span class="text-red-500">*</span>
+          </label>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            class="w-full"
+            [class.p-invalid]="isFieldInvalid('email')"
+          />
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('email')"
+          >
+            {{ getFieldError('email') }}
+          </small>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <label for="password" class="block text-900 font-medium mb-2">
+            Password <span class="text-red-500">*</span>
+          </label>
+          <p-password
+            formControlName="password"
+            inputId="password"
+            placeholder="Enter your password"
+            [class.p-invalid]="isFieldInvalid('password')"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="true"
+            [toggleMask]="true"
+          ></p-password>
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('password')"
+          >
+            {{ getFieldError('password') }}
+          </small>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <label for="confirmPassword" class="block text-900 font-medium mb-2">
+            Confirm Password <span class="text-red-500">*</span>
+          </label>
+          <p-password
+            formControlName="confirmPassword"
+            inputId="confirmPassword"
+            placeholder="Confirm your password"
+            [class.p-invalid]="isFieldInvalid('confirmPassword')"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="false"
+            [toggleMask]="true"
+          ></p-password>
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('confirmPassword')"
+          >
+            {{ getFieldError('confirmPassword') }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Personal Information Section -->
+      <div class="text-900 text-xl font-medium mb-3 mt-4">Personal Information</div>
+      
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <label for="firstName" class="block text-900 font-medium mb-2">
+            First Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            pInputText
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            placeholder="Enter your first name"
+            class="w-full"
+            [class.p-invalid]="isFieldInvalid('firstName')"
+          />
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('firstName')"
+          >
+            {{ getFieldError('firstName') }}
+          </small>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <label for="lastName" class="block text-900 font-medium mb-2">
+            Last Name
+          </label>
+          <input
+            pInputText
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            placeholder="Enter your last name"
+            class="w-full"
+            [class.p-invalid]="isFieldInvalid('lastName')"
+          />
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('lastName')"
+          >
+            {{ getFieldError('lastName') }}
+          </small>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <label for="phone" class="block text-900 font-medium mb-2">
+            Phone Number
+          </label>
+          <input
+            pInputText
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="Enter your phone number"
+            class="w-full"
+            [class.p-invalid]="isFieldInvalid('phone')"
+          />
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('phone')"
+          >
+            {{ getFieldError('phone') }}
+          </small>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <label for="experienceYears" class="block text-900 font-medium mb-2">
+            Years of Experience
+          </label>
+          <p-inputNumber
+            formControlName="experienceYears"
+            inputId="experienceYears"
+            placeholder="0"
+            [min]="0"
+            [max]="50"
+            class="w-full"
+            [class.p-invalid]="isFieldInvalid('experienceYears')"
+          ></p-inputNumber>
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('experienceYears')"
+          >
+            {{ getFieldError('experienceYears') }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Professional Information Section -->
+      <div class="text-900 text-xl font-medium mb-3 mt-4">Professional Information</div>
+      
+      <div class="grid">
+        <div class="col-12">
+          <label for="headline" class="block text-900 font-medium mb-2">
+            Professional Headline
+          </label>
+          <input
+            pInputText
+            id="headline"
+            type="text"
+            formControlName="headline"
+            placeholder="e.g., Full Stack Developer | React & Node.js Expert"
+            class="w-full"
+            [class.p-invalid]="isFieldInvalid('headline')"
+          />
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('headline')"
+          >
+            {{ getFieldError('headline') }}
+          </small>
+          <small class="text-500">Max 100 characters</small>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-12">
+          <label for="summary" class="block text-900 font-medium mb-2">
+            Professional Summary
+          </label>
+          <textarea
+            pInputTextarea
+            id="summary"
+            formControlName="summary"
+            placeholder="Brief description of your professional background and expertise"
+            rows="4"
+            class="w-full"
+            [class.p-invalid]="isFieldInvalid('summary')"
+          ></textarea>
+          <small 
+            class="p-error block" 
+            *ngIf="isFieldInvalid('summary')"
+          >
+            {{ getFieldError('summary') }}
+          </small>
+          <small class="text-500">Max 500 characters</small>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-12">
+          <label class="block text-900 font-medium mb-2">Skills</label>
+          <p-autoComplete
+            [(ngModel)]="selectedSkills"
+            [suggestions]="filteredSkills"
+            (completeMethod)="filterSkills($event)"
+            (onSelect)="onSkillSelect($event)"
+            placeholder="Type to search and add skills"
+            [ngModelOptions]="{standalone: true}"
+            class="w-full"
+          ></p-autoComplete>
+          
+          <!-- Selected Skills Display -->
+          <div class="mt-2" *ngIf="selectedSkills.length > 0">
+            <span class="text-900 font-medium">Selected Skills:</span>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <p-chip 
+                *ngFor="let skill of selectedSkills; trackBy: trackBySkill"
+                [label]="skill"
+                [removable]="true"
+                (onRemove)="removeSkill(skill)"
+                styleClass="p-chip-primary"
+              ></p-chip>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="grid mt-4">
+        <div class="col-12">
+          <div class="flex align-items-center">
+            <p-checkbox
+              formControlName="termsAccepted"
+              inputId="termsAccepted"
+              [binary]="true"
+              [class.p-invalid]="isFieldInvalid('termsAccepted')"
+            ></p-checkbox>
+            <label for="termsAccepted" class="ml-2">
+              I agree to the 
+              <a href="/terms" target="_blank" class="text-primary font-medium">Terms and Conditions</a>
+              and 
+              <a href="/privacy" target="_blank" class="text-primary font-medium">Privacy Policy</a>
+              <span class="text-red-500">*</span>
+            </label>
+          </div>
+          <small 
+            class="p-error block ml-4" 
+            *ngIf="isFieldInvalid('termsAccepted')"
+          >
+            {{ getFieldError('termsAccepted') }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <p-button
+        type="submit"
+        label="Create Account"
+        styleClass="w-full mt-4"
+        [loading]="loading"
+        [disabled]="registrationForm.invalid || loading"
+      ></p-button>
+
+      <!-- Login Link -->
+      <div class="text-center mt-4">
+        <span class="text-600">Already have an account? </span>
+        <a (click)="navigateToLogin()" class="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
+          Sign In
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Toast Messages -->
+  <p-toast position="top-right"></p-toast>
+</div>

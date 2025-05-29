@@ -11,6 +11,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { RippleModule } from 'primeng/ripple';
 import { RouterModule, Routes } from '@angular/router';
+import { DropdownModule } from 'primeng/dropdown';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { ChipModule } from 'primeng/chip';
+import { InputNumberModule } from 'primeng/inputnumber';
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -33,6 +37,9 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { GuestGuard } from './guards/GuestGuard';
 import { AuthGuard } from './guards/AuthGuard';
+import { CandidateregisterComponent } from './components/register/candidateregister/candidateregister.component';
+import { EmployeeregisterComponent } from './components/register/employeeregister/employeeregister.component';
+import { RegistrationService } from './services/registration.service';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -45,6 +52,16 @@ const routes: Routes = [
     path: 'profile', 
     component: ProfileComponent,
     canActivate: [AuthGuard]
+  },
+   { 
+    path: 'register/candidate', 
+    component: CandidateregisterComponent,
+    canActivate: [GuestGuard]
+  },
+   { 
+    path: 'register/employer', 
+    component: EmployeeregisterComponent,
+    canActivate: [GuestGuard]
   },
   {
     path:'**',
@@ -61,6 +78,8 @@ const routes: Routes = [
     HomeComponent,
     NavbarComponent,
     FooterComponent,
+    CandidateregisterComponent,
+    EmployeeregisterComponent,
     
     
   ],
@@ -82,13 +101,17 @@ const routes: Routes = [
     ConfirmDialogModule,
     TooltipModule,
     RippleModule,
-    CheckboxModule
-
+    CheckboxModule,
+    DropdownModule,
+    AutoCompleteModule,
+    ChipModule,
+    InputNumberModule,
   ],
   providers: [ 
     AuthGuard,
     GuestGuard,
     AuthService,
+    RegistrationService,
     MessageService,
     ConfirmationService,
     {

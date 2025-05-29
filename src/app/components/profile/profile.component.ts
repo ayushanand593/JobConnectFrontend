@@ -12,202 +12,219 @@ import { AuthService } from 'src/app/services/auth-service.service';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent {
-currentUser: User | null = null;
-  emailForm: FormGroup;
-  passwordForm: FormGroup;
-  
-  emailLoading = false;
-  passwordLoading = false;
-  showEmailDialog = false;
-  showPasswordDialog = false;
+  export class ProfileComponent {
+  currentUser: User | null = null;
+    emailForm: FormGroup;
+    passwordForm: FormGroup;
+    
+    emailLoading = false;
+    passwordLoading = false;
+    showEmailDialog = false;
+    showPasswordDialog = false;
 
-  private destroy$ = new Subject<void>();
+    private destroy$ = new Subject<void>();
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService
-  ) {
-    this.emailForm = this.formBuilder.group({
-      currentPassword: ['', [Validators.required]],
-      newEmail: ['', [Validators.required, Validators.email]]
-    });
-
-    this.passwordForm = this.formBuilder.group({
-      currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, {
-      validators: this.passwordMatchValidator
-    });
-  }
-
-  ngOnInit(): void {
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        this.currentUser = user;
-        if (user) {
-          this.emailForm.patchValue({
-            newEmail: user.email
-          });
-        }
+    constructor(
+      private formBuilder: FormBuilder,
+      private authService: AuthService,
+      private messageService: MessageService,
+      private confirmationService: ConfirmationService
+    ) {
+      this.emailForm = this.formBuilder.group({
+        currentPassword: ['', [Validators.required]],
+        newEmail: ['', [Validators.required, Validators.email]]
       });
-  }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  openEmailDialog(): void {
-    this.emailForm.reset();
-    this.emailForm.patchValue({
-      newEmail: this.currentUser?.email || ''
-    });
-    this.showEmailDialog = true;
-  }
-
-  openPasswordDialog(): void {
-    this.passwordForm.reset();
-    this.showPasswordDialog = true;
-  }
-
-  updateEmail(): void {
-    if (this.emailForm.invalid) {
-      this.markFormGroupTouched(this.emailForm);
-      return;
+      this.passwordForm = this.formBuilder.group({
+        currentPassword: ['', [Validators.required]],
+        newPassword: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]]
+      }, {
+        validators: this.passwordMatchValidator
+      });
     }
 
-    const emailUpdate: EmailUpdateRequest = {
-      currentPassword: this.emailForm.get('currentPassword')?.value,
-      newEmail: this.emailForm.get('newEmail')?.value
-    };
-
-    this.emailLoading = true;
-    this.authService.updateEmail(emailUpdate)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.emailLoading = false;
-          this.showEmailDialog = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Email updated successfully!'
-          });
-        },
-        error: (error) => {
-          this.emailLoading = false;
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: error || 'Failed to update email'
-          });
-        }
-      });
-  }
-
-  updatePassword(): void {
-    if (this.passwordForm.invalid) {
-      this.markFormGroupTouched(this.passwordForm);
-      return;
+    ngOnInit(): void {
+      this.authService.currentUser$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(user => {
+          this.currentUser = user;
+          if (user) {
+            this.emailForm.patchValue({
+              newEmail: user.email
+            });
+          }
+        });
     }
 
-    const passwordUpdate: PasswordUpdateRequest = {
-      currentPassword: this.passwordForm.get('currentPassword')?.value,
-      newPassword: this.passwordForm.get('newPassword')?.value
-    };
+    ngOnDestroy(): void {
+      this.destroy$.next();
+      this.destroy$.complete();
+    }
 
-    this.passwordLoading = true;
-    this.authService.updatePassword(passwordUpdate)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.passwordLoading = false;
-          this.showPasswordDialog = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Password updated successfully!'
-          });
-        },
-        error: (error) => {
-          this.passwordLoading = false;
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: error || 'Failed to update password'
-          });
-        }
+    openEmailDialog(): void {
+      this.emailForm.reset();
+      this.emailForm.patchValue({
+        newEmail: this.currentUser?.email || ''
       });
+      this.showEmailDialog = true;
+    }
+
+    openPasswordDialog(): void {
+      this.passwordForm.reset();
+      this.showPasswordDialog = true;
+    }
+
+ updateEmail(): void {
+  if (this.emailForm.invalid) {
+    this.markFormGroupTouched(this.emailForm);
+    return;
   }
 
-  confirmLogout(): void {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to logout?',
-      header: 'Confirm Logout',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.authService.logout();
+  const emailUpdate: EmailUpdateRequest = {
+    currentPassword: this.emailForm.get('currentPassword')?.value,
+    newEmail: this.emailForm.get('newEmail')?.value
+  };
+
+  this.emailLoading = true;
+  this.authService.updateEmail(emailUpdate)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response) => {
+        this.emailLoading = false;
+        this.showEmailDialog = false;
+        
+        // Reset the form after successful update
+        this.emailForm.reset();
+        
         this.messageService.add({
-          severity: 'info',
-          summary: 'Logged Out',
-          detail: 'You have been successfully logged out'
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Email updated successfully! Please LogIn Again'
+        });
+        setTimeout(() => {
+          this.authService.logout();
+        }, 2000); // 2 seconds delay so user can see the message
+      },
+      error: (errorMessage) => {
+        this.emailLoading = false;
+        console.error('Email update error:', errorMessage);
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMessage || 'Failed to update email'
         });
       }
     });
+}
+
+   updatePassword(): void {
+  if (this.passwordForm.invalid) {
+    this.markFormGroupTouched(this.passwordForm);
+    return;
   }
 
-  private passwordMatchValidator(formGroup: FormGroup) {
-    const newPassword = formGroup.get('newPassword');
-    const confirmPassword = formGroup.get('confirmPassword');
-    
-    if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    }
-    
-    if (confirmPassword?.errors?.['passwordMismatch']) {
-      delete confirmPassword.errors['passwordMismatch'];
-      if (Object.keys(confirmPassword.errors).length === 0) {
-        confirmPassword.setErrors(null);
+  const passwordUpdate: PasswordUpdateRequest = {
+    currentPassword: this.passwordForm.get('currentPassword')?.value,
+    newPassword: this.passwordForm.get('newPassword')?.value
+  };
+
+  this.passwordLoading = true;
+  this.authService.updatePassword(passwordUpdate)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response) => {
+        this.passwordLoading = false;
+        this.showPasswordDialog = false;
+        
+        // Reset the form after successful update
+        this.passwordForm.reset();
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Password updated successfully! Please login Again'
+        });
+         setTimeout(() => {
+          this.authService.logout();
+        }, 2000);
+      },
+      error: (errorMessage) => {
+        this.passwordLoading = false;
+        console.error('Password update error:', errorMessage);
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMessage || 'Failed to update password'
+        });
       }
-    }
-    
-    return null;
-  }
-
-  private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(field => {
-      const control = formGroup.get(field);
-      control?.markAsTouched({ onlySelf: true });
     });
-  }
-
-  isFieldInvalid(formGroup: FormGroup, fieldName: string): boolean {
-    const field = formGroup.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
-  }
-
-  getFieldError(formGroup: FormGroup, fieldName: string): string {
-    const field = formGroup.get(fieldName);
-    if (field?.errors) {
-      if (field.errors['required']) {
-        return `${fieldName.replace(/([A-Z])/g, ' $1').toLowerCase()} is required`;
-      }
-      if (field.errors['email']) {
-        return 'Please enter a valid email address';
-      }
-      if (field.errors['minlength']) {
-        return `Password must be at least ${field.errors['minlength'].requiredLength} characters`;
-      }
-      if (field.errors['passwordMismatch']) {
-        return 'Passwords do not match';
-      }
+}
+    confirmLogout(): void {
+      this.confirmationService.confirm({
+        message: 'Are you sure you want to logout?',
+        header: 'Confirm Logout',
+        icon: 'pi pi-exclamation-triangle',
+        accept: () => {
+          this.authService.logout();
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Logged Out',
+            detail: 'You have been successfully logged out'
+          });
+        }
+      });
     }
-    return '';
-}
-}
+
+    private passwordMatchValidator(formGroup: FormGroup) {
+      const newPassword = formGroup.get('newPassword');
+      const confirmPassword = formGroup.get('confirmPassword');
+      
+      if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
+        confirmPassword.setErrors({ passwordMismatch: true });
+        return { passwordMismatch: true };
+      }
+      
+      if (confirmPassword?.errors?.['passwordMismatch']) {
+        delete confirmPassword.errors['passwordMismatch'];
+        if (Object.keys(confirmPassword.errors).length === 0) {
+          confirmPassword.setErrors(null);
+        }
+      }
+      
+      return null;
+    }
+
+    private markFormGroupTouched(formGroup: FormGroup): void {
+      Object.keys(formGroup.controls).forEach(field => {
+        const control = formGroup.get(field);
+        control?.markAsTouched({ onlySelf: true });
+      });
+    }
+
+    isFieldInvalid(formGroup: FormGroup, fieldName: string): boolean {
+      const field = formGroup.get(fieldName);
+      return !!(field && field.invalid && (field.dirty || field.touched));
+    }
+
+    getFieldError(formGroup: FormGroup, fieldName: string): string {
+      const field = formGroup.get(fieldName);
+      if (field?.errors) {
+        if (field.errors['required']) {
+          return `${fieldName.replace(/([A-Z])/g, ' $1').toLowerCase()} is required`;
+        }
+        if (field.errors['email']) {
+          return 'Please enter a valid email address';
+        }
+        if (field.errors['minlength']) {
+          return `Password must be at least ${field.errors['minlength'].requiredLength} characters`;
+        }
+        if (field.errors['passwordMismatch']) {
+          return 'Passwords do not match';
+        }
+      }
+      return '';
+  }
+  }

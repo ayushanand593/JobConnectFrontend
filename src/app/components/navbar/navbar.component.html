@@ -3,16 +3,16 @@
     <div class="navbar-brand">
       <span class="navbar-logo">JobConnect</span>
     </div>
-    <div class="navbar-menu">
+    <!-- <div class="navbar-menu">
       <a href="#" class="navbar-item active">Jobs</a>
       <a href="#" class="navbar-item">Companies</a>
       <a href="#" class="navbar-item">Resources</a>
-    </div>
+    </div> -->
     <div class="navbar-actions">
       <ng-container *ngIf="!isAuthenticated; else loggedIn">
-        <a href="#" class="navbar-link">For Employers</a>
-        <a class="navbar-button outline" routerLink="/login">Log in</a>
-        <a href="#" class="navbar-button primary">Sign up</a>
+     <!-- In your component's .html file -->
+       <a class="navbar-button primary" routerLink="/login">Log in</a>
+<p-dropdown [options]="options" [(ngModel)]="selectedOption" (onChange)="navigateToComponent($event)" placeholder="Sign Up"></p-dropdown>
       </ng-container>
       <ng-template #loggedIn>
         <span class="navbar-welcome">Welcome {{currentUser?.role}}</span>
