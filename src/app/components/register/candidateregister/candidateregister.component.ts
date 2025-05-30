@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -15,7 +15,7 @@ import { ValidationError } from 'src/app/interfaces/ValidationError';
   templateUrl: './candidateregister.component.html',
   styleUrls: ['./candidateregister.component.scss']
 })
-export class CandidateregisterComponent {
+export class CandidateregisterComponent implements OnInit {
   registrationForm: FormGroup;
   loading = false;
   skillSuggestions: string[] = [
@@ -61,23 +61,15 @@ export class CandidateregisterComponent {
   }
 
   private passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password');
-    const confirmPassword = form.get('confirmPassword');
-    
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    }
-    
-    if (confirmPassword?.errors?.['passwordMismatch']) {
-      delete confirmPassword.errors['passwordMismatch'];
-      if (Object.keys(confirmPassword.errors).length === 0) {
-        confirmPassword.setErrors(null);
-      }
-    }
-    
-    return null;
+  const password = form.get('password')?.value;
+  const confirmPassword = form.get('confirmPassword');
+  
+  if (password && confirmPassword?.value && password !== confirmPassword.value) {
+    return { passwordMismatch: true };
   }
+  
+  return null;
+}
 
   onSkillSelect(event: any): void {
     const skill = event.value;
@@ -97,65 +89,63 @@ export class CandidateregisterComponent {
     );
   }
 
-  onSubmit(): void {
-    if (this.registrationForm.valid) {
-      this.loading = true;
+onSubmit(): void {
+  if (this.registrationForm.valid) {
+    this.loading = true;
+    const formValue = this.registrationForm.value;
+    const registrationData: CandidateRegistration = {
+      email: formValue.email.trim(),
+      password: formValue.password,
+      firstName: formValue.firstName.trim(),
+      lastName: formValue.lastName?.trim() || undefined,
+      phone: formValue.phone?.trim() || undefined,
+      headline: formValue.headline?.trim() || undefined,
+      summary: formValue.summary?.trim() || undefined,
+      experienceYears: formValue.experienceYears || undefined,
+      skills: this.selectedSkills.length > 0 ? this.selectedSkills : undefined,
+      termsAccepted: formValue.termsAccepted
+    };
 
-      const formValue = this.registrationForm.value;
-      const registrationData: CandidateRegistration = {
-        email: formValue.email.trim(),
-        password: formValue.password,
-        firstName: formValue.firstName.trim(),
-        lastName: formValue.lastName?.trim() || undefined,
-        phone: formValue.phone?.trim() || undefined,
-        headline: formValue.headline?.trim() || undefined,
-        summary: formValue.summary?.trim() || undefined,
-        experienceYears: formValue.experienceYears || undefined,
-        skills: this.selectedSkills.length > 0 ? this.selectedSkills : undefined,
-        termsAccepted: formValue.termsAccepted
-      };
-
-      // Client-side validation
+    // Client-side validation
       const validationErrors = this.registrationService.validateCandidateData(registrationData);
-      if (validationErrors.length > 0) {
-        this.handleValidationErrors(validationErrors);
-        this.loading = false;
-        return;
-      }
-
-      // Submit registration
-      this.registrationService.registerCandidate(registrationData).subscribe({
-        next: (response) => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Registration Successful',
-            detail: 'Welcome! Your account has been created successfully.'
-          });
-          
-          // Redirect to dashboard or profile completion page
-          setTimeout(() => {
-            this.router.navigate(['/profile']);
-          }, 1500);
-        },
-        error: (error: RegistrationError) => {
-          this.loading = false;
-          this.handleRegistrationError(error);
-        },
-        complete: () => {
-          this.loading = false;
-        }
-      });
-    } else {
-      this.markFormGroupTouched();
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Form Invalid',
-        detail: 'Please correct the errors in the form'
-      });
+    if (validationErrors.length > 0) {
+      this.handleValidationErrors(validationErrors);
+      this.loading = false;
+      return;
     }
-  }
 
-  private handleValidationErrors(errors: ValidationError[]): void {
+    this.registrationService.registerCandidate(registrationData).subscribe({
+      next: (response) => {
+        this.loading = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Registration Successful',
+          detail: 'Welcome! Your account has been created successfully.'
+        });
+        // Only navigate when registration is successful
+        setTimeout(() => {
+          this.router.navigate(['/profile']);
+        }, 1500);
+      },
+         error: (error: RegistrationError) => {
+        this.loading = false;
+        console.error('Registration error:', error); // For debugging
+        this.handleRegistrationError(error);  
+      }
+    });
+  } else {
+    this.markFormGroupTouched();
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Form Invalid',
+      detail: 'Please correct the errors in the form'
+    });
+  }
+}
+
+
+
+ private handleValidationErrors(errors: ValidationError[]): void {
     errors.forEach(error => {
       const control = this.registrationForm.get(error.field);
       if (control) {
@@ -170,7 +160,7 @@ export class CandidateregisterComponent {
     });
   }
 
-  private handleRegistrationError(error: RegistrationError): void {
+   private handleRegistrationError(error: RegistrationError): void {
     if (error.validationErrors) {
       this.handleValidationErrors(error.validationErrors);
     } else {
@@ -182,7 +172,7 @@ export class CandidateregisterComponent {
     }
   }
 
-  private markFormGroupTouched(): void {
+   private markFormGroupTouched(): void {
     Object.keys(this.registrationForm.controls).forEach(key => {
       const control = this.registrationForm.get(key);
       control?.markAsTouched();
@@ -254,4 +244,7 @@ export class CandidateregisterComponent {
   trackBySkill(index: number, skill: string): string {
     return skill;
   }
+
+
 }
+

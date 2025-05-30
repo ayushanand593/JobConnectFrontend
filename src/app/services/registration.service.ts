@@ -56,13 +56,13 @@ private readonly API_URL = 'http://localhost:8080/api';
   /**
    * Check if email is already registered
    */
-  checkEmailAvailability(email: string): Observable<{ available: boolean }> {
-    return this.http.get<{ available: boolean }>(`${this.API_URL}/check-email`, {
-      params: { email }
-    }).pipe(
-      catchError(this.handleError)
-    );
-  }
+  // checkEmailAvailability(email: string): Observable<{ available: boolean }> {
+  //   return this.http.get<{ available: boolean }>(`${this.API_URL}/check-email`, {
+  //     params: { email }
+  //   }).pipe(
+  //     catchError(this.handleError)
+  //   );
+  // }
 
   /**
    * Validate registration data before submission
@@ -123,40 +123,57 @@ private readonly API_URL = 'http://localhost:8080/api';
   /**
    * Handle registration-specific errors
    */
-  private handleRegistrationError(error: HttpErrorResponse) {
-    let errorMessage = 'Registration failed. Please try again.';
-    let validationErrors: ValidationError[] = [];
+private handleRegistrationError(error: HttpErrorResponse) {
+  console.log('RegistrationService.handleRegistrationError called with:', error);
+  
+  let errorMessage = 'Registration failed. Please try again.';
+  let validationErrors: ValidationError[] = [];
 
-    if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMessage = error.error.message;
-    } else {
-      // Server-side error
-      if (error.status === 400) {
-        // Validation errors
-        if (error.error && error.error.validationErrors) {
-          validationErrors = error.error.validationErrors;
-          errorMessage = 'Please correct the validation errors';
-        } else if (error.error && error.error.message) {
-          errorMessage = error.error.message;
-        }
-      } else if (error.status === 409) {
-        // Conflict (email already exists)
-        errorMessage = error.error?.message || 'Email already registered';
-        validationErrors = [{ field: 'email', message: errorMessage }];
+  if (error.error instanceof ErrorEvent) {
+    // Client-side error
+    console.log('Client-side error detected:', error.error.message);
+    errorMessage = error.error.message;
+  } else {
+    // Server-side error
+    console.log('Server-side error detected. Status:', error.status);
+    console.log('Error response body:', error.error);
+    
+    if (error.status === 400) {
+      // Validation errors
+      if (error.error && error.error.validationErrors) {
+        validationErrors = error.error.validationErrors;
+        errorMessage = 'Please correct the validation errors';
+        console.log('Validation errors found:', validationErrors);
       } else if (error.error && error.error.message) {
         errorMessage = error.error.message;
+        console.log('400 error with message:', errorMessage);
       }
+    } else if (error.status === 409) {
+      // Conflict (email already exists)
+      errorMessage = error.error?.message || 'Email already registered';
+      validationErrors = [{ field: 'email', message: errorMessage }];
+      console.log('409 conflict error:', errorMessage);
+    } else if (error.status === 401) {
+      // Unauthorized
+      errorMessage = error.error?.message || 'Unauthorized access';
+      console.log('401 unauthorized error:', errorMessage);
+    } else if (error.error && error.error.message) {
+      errorMessage = error.error.message;
+      console.log('Other server error with message:', errorMessage);
+    } else if (error.message) {
+      errorMessage = error.message;
+      console.log('Using error.message as fallback:', errorMessage);
     }
-
-    const registrationError: RegistrationError = {
-      message: errorMessage,
-      validationErrors: validationErrors.length > 0 ? validationErrors : undefined
-    };
-
-    return throwError(() => registrationError);
   }
 
+      const registrationError: RegistrationError = {
+    message: errorMessage,
+    validationErrors: validationErrors.length > 0 ? validationErrors : undefined
+  };
+
+  console.log('Final registration error object:', registrationError);
+  return throwError(() => registrationError);
+}
   /**
    * Generic error handler
    */

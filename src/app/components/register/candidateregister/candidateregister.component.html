@@ -8,7 +8,6 @@
     </div>
 
     <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-      <!-- Email and Password Section -->
       <div class="grid">
         <div class="col-12">
           <label for="email" class="block text-900 font-medium mb-2">
@@ -81,7 +80,7 @@
       <!-- Personal Information Section -->
       <div class="text-900 text-xl font-medium mb-3 mt-4">Personal Information</div>
       
-      <div class="grid">
+      <div class="grid"> 
         <div class="col-12 md:col-6">
           <label for="firstName" class="block text-900 font-medium mb-2">
             First Name <span class="text-red-500">*</span>
@@ -295,6 +294,6 @@
     </form>
   </div>
 
-  <!-- Toast Messages -->
-  <p-toast position="top-right"></p-toast>
+  <!-- REMOVE THIS LINE - p-toast is now in app.component.html -->
+  <!-- <p-toast position="top-right"></p-toast> -->
 </div>

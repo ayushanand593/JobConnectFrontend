@@ -1,0 +1,124 @@
+<!-- job-list.component.html -->
+<div class="job-list-container">
+  <!-- Header Section -->
+  <div class="job-list-header">
+    <div class="job-count">
+      <h2>{{ totalRecords | number }} Jobs Found</h2>
+    </div>
+    <div class="sort-section">
+      <label for="sortBy">Sort by:</label>
+      <p-dropdown 
+        id="sortBy"
+        [options]="sortOptions" 
+        [(ngModel)]="selectedSort"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="onSortChange()"
+        [style]="{'min-width': '150px'}"
+        styleClass="sort-dropdown">
+      </p-dropdown>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <p-progressSpinner 
+      strokeWidth="3" 
+      animationDuration="2s">
+    </p-progressSpinner>
+  </div>
+
+  <!-- Job Cards -->
+  <div *ngIf="!loading" class="job-cards">
+    <div *ngFor="let job of jobs" class="job-card">
+      <!-- Company Logo/Initial -->
+      <div class="company-logo">
+        <div class="logo-placeholder">
+          {{ job.companyName.charAt(0).toUpperCase() }}{{ job.companyName.split(' ')[1] ? job.companyName.split(' ')[1].charAt(0).toUpperCase() : job.companyName.charAt(1).toUpperCase() }}
+        </div>
+      </div>
+
+      <!-- Job Content -->
+      <div class="job-content">
+        <!-- Job Title and Company -->
+        <div class="job-header">
+          <h3 class="job-title">{{ job.title }}</h3>
+          <p class="company-name">{{ job.companyName }}</p>
+        </div>
+
+        <!-- Job Details -->
+        <div class="job-details">
+          <div class="detail-item">
+            <i class="pi pi-map-marker"></i>
+            <span>{{ job.location }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="pi pi-briefcase"></i>
+            <span>{{ formatJobType(job.jobType) }}</span>
+          </div>
+          <div class="detail-item" *ngIf="job.experienceLevel">
+            <i class="pi pi-user"></i>
+            <span>{{ formatExperienceLevel(job.experienceLevel) }}</span>
+          </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="skills-section" *ngIf="job.skills && job.skills.length > 0">
+          <p-chip 
+            *ngFor="let skill of job.skills.slice(0, 3)" 
+            [label]="skill.name"
+            styleClass="skill-chip">
+          </p-chip>
+          <span *ngIf="job.skills.length > 3" class="more-skills">
+            +{{ job.skills.length - 3 }} more
+          </span>
+        </div>
+
+        <!-- Job Description Preview -->
+        <div class="job-description" *ngIf="job.description">
+          <p>{{ job.description.length > 100 ? (job.description | slice:0:100) + '...' : job.description }}</p>
+        </div>
+      </div>
+
+      <!-- Job Actions -->
+      <div class="job-actions">
+        <div class="job-meta">
+          <div class="salary" *ngIf="job.salaryRange">
+            <strong>{{ job.salaryRange }}</strong>
+          </div>
+          <div class="posted-date">
+            <small>Posted {{ getTimeAgo(job.createdAt) }}</small>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <p-button 
+            label="Apply Now" 
+            icon="pi pi-send"
+            styleClass="apply-button"
+            (onClick)="navigateTo(job)">
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && jobs.length === 0" class="empty-state">
+    <i class="pi pi-search" style="font-size: 3rem; color: #6c757d;"></i>
+    <h3>No Jobs Found</h3>
+    <p>Try adjusting your search criteria or check back later for new opportunities.</p>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalRecords > 0" class="pagination-container">
+    <p-paginator
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [first]="first"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} jobs">
+    </p-paginator>
+  </div>
+</div>

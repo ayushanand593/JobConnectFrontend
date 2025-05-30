@@ -15,6 +15,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ChipModule } from 'primeng/chip';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { PaginatorModule } from 'primeng/paginator';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -40,6 +42,8 @@ import { AuthGuard } from './guards/AuthGuard';
 import { CandidateregisterComponent } from './components/register/candidateregister/candidateregister.component';
 import { EmployeeregisterComponent } from './components/register/employeeregister/employeeregister.component';
 import { RegistrationService } from './services/registration.service';
+import { JobListComponent } from './components/home/job/job-list/job-list.component';
+import { JobService } from './services/job.service';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -80,6 +84,7 @@ const routes: Routes = [
     FooterComponent,
     CandidateregisterComponent,
     EmployeeregisterComponent,
+    JobListComponent,
     
     
   ],
@@ -89,7 +94,12 @@ const routes: Routes = [
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routes,{
+      scrollPositionRestoration: 'enabled',
+      anchorScrolling: 'enabled',       // optional—lets you jump to #anchors
+      scrollOffset: [0, 0]             // optional—offset [x, y]
+    
+    }),
     
     // PrimeNG Modules
     ButtonModule,
@@ -106,12 +116,15 @@ const routes: Routes = [
     AutoCompleteModule,
     ChipModule,
     InputNumberModule,
+    PaginatorModule,
+    ProgressSpinnerModule,
   ],
   providers: [ 
     AuthGuard,
     GuestGuard,
     AuthService,
     RegistrationService,
+    JobService,
     MessageService,
     ConfirmationService,
     {
