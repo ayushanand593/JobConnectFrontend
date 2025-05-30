@@ -1,0 +1,165 @@
+<!-- job-detail.component.html -->
+<div class="job-detail-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Loading job details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p-message severity="error" text="Failed to load job details. Please try again."></p-message>
+    <p-button label="Retry" icon="pi pi-refresh" (click)="loadJobDetails()"></p-button>
+    <p-button label="Go Back" icon="pi pi-arrow-left" severity="secondary" (click)="goBack()"></p-button>
+  </div>
+
+  <!-- Job Detail Content -->
+  <div *ngIf="job && !loading && !error" class="job-detail-content">
+    <!-- Header Section -->
+    <div class="job-header">
+    
+      
+      <div class="job-header-content">
+        <div class="job-logo-section">
+          <!-- Company Logo or Initials -->
+          <div class="logo-container">
+            <img 
+              *ngIf="job.logoDataUrl" 
+              [src]="job.logoDataUrl" 
+              [alt]="job.companyName + ' logo'"
+              class="company-logo">
+            <div 
+              *ngIf="!job.logoDataUrl" 
+              class="company-initials"
+              [style.background-color]="'#6c5ce7'">
+              {{getCompanyInitials(job.companyName)}}
+            </div>
+          </div>
+        </div>
+
+        <div class="job-info-section">
+          <div class="job-title-row">
+            <h1 class="job-title">{{job.title}}</h1>
+            <div class="job-actions">
+              <p-button 
+                label="Apply Now" 
+                icon="pi pi-send" 
+                (click)="onApplyNow()"
+                class="apply-button">
+              </p-button>
+            </div>
+          </div>
+          
+          <h2 class="company-name">{{job.companyName}}</h2>
+          
+          <div class="job-meta">
+            <span class="meta-item">
+              <i class="pi pi-map-marker"></i>
+              {{job.location}}
+            </span>
+            <span class="meta-item">
+              <i class="pi pi-briefcase"></i>
+              {{formatJobType(job.jobType)}}
+            </span>
+            <span class="meta-item" *ngIf="job.experienceLevel">
+              <i class="pi pi-user"></i>
+              {{formatExperienceLevel(job.experienceLevel)}}
+            </span>
+          </div>
+
+          <div class="salary-and-date">
+            <div class="salary-range">{{job.salaryRange}}</div>
+            <div class="posted-date">{{getDaysAgo(job.createdAt)}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Details Cards -->
+    <div class="job-details-grid">
+      <!-- Skills Card -->
+      <p-card header="Required Skills" class="details-card">
+        <div class="skills-container">
+          <p-chip 
+            *ngFor="let skill of job.skills" 
+            [label]="skill.name" 
+            class="skill-chip">
+          </p-chip>
+        </div>
+      </p-card>
+
+      <!-- Job Description Card -->
+      <p-card header="Job Description" class="details-card">
+        <p class="description-text">{{job.description}}</p>
+      </p-card>
+
+      <!-- Requirements Card -->
+      <p-card 
+        header="Requirements" 
+        class="details-card"
+        *ngIf="job.requirements">
+        <p class="requirements-text">{{job.requirements}}</p>
+      </p-card>
+
+      <!-- Responsibilities Card -->
+      <p-card 
+        header="Responsibilities" 
+        class="details-card"
+        *ngIf="job.responsibilities">
+        <p class="responsibilities-text">{{job.responsibilities}}</p>
+      </p-card>
+
+      <!-- Job Information Card -->
+      <p-card header="Job Information" class="details-card">
+        <div class="job-info-grid">
+          <div class="info-item">
+            <label>Job Type:</label>
+            <span>{{formatJobType(job.jobType)}}</span>
+          </div>
+          <div class="info-item" *ngIf="job.experienceLevel">
+            <label>Experience Level:</label>
+            <span>{{formatExperienceLevel(job.experienceLevel)}}</span>
+          </div>
+          <div class="info-item">
+            <label>Status:</label>
+            <p-tag 
+              [value]="job.status" 
+              [severity]="job.status === 'OPEN' ? 'success' : 'danger'">
+            </p-tag>
+          </div>
+          <div class="info-item" *ngIf="job.applicationDeadline">
+            <label>Application Deadline:</label>
+            <span>{{job.applicationDeadline | date}}</span>
+          </div>
+          <div class="info-item">
+            <label>Location:</label>
+            <span>{{job.location}}</span>
+          </div>
+          <div class="info-item">
+            <label>Salary Range:</label>
+            <span>{{job.salaryRange}}</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Apply Section -->
+    <div class="apply-section">
+      <p-card>
+        <div class="apply-content">
+          <div class="apply-text">
+            <h3>Ready to apply?</h3>
+            <p>Join {{job.companyName}} and take your career to the next level!</p>
+          </div>
+          <p-button 
+            label="Apply Now" 
+            icon="pi pi-send" 
+            size="large"
+            (click)="onApplyNow()"
+            class="apply-button-large">
+          </p-button>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

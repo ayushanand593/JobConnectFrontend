@@ -19,4 +19,8 @@ private apiUrl = 'http://localhost:8080/api/jobs'; // Adjust base URL as needed
 
     return this.http.get<PageResponse<Job>>(`${this.apiUrl}/jobs`, { params });
   }
+
+  getJobByJobId(jobId:String):Observable<Job>{
+    return this.http.get<Job>(`${this.apiUrl}/jobId/${jobId}`);
+  }
 }

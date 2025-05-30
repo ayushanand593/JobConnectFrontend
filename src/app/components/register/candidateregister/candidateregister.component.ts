@@ -244,7 +244,5 @@ onSubmit(): void {
   trackBySkill(index: number, skill: string): string {
     return skill;
   }
-
-
 }
 

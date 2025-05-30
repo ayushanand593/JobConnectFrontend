@@ -28,33 +28,71 @@ export class JobListComponent implements OnInit {
   
   selectedSort = 'relevant';
 
+  defaultLogoUrl = 'assets/images/default-company-logo.png';
+
   constructor(private jobService: JobService, private router:Router) {}
 
   ngOnInit(): void {
     this.loadJobs();
   }
 
-  loadJobs(event?: any): void {
-    this.loading = true;
-    
-    const page = event ? event.first / event.rows : 0;
-    const size = event ? event.rows : this.rows;
+   loadJobs(event?: any): void {
+  this.loading = true;
+  
+  const page = event ? event.first / event.rows : 0;
+  const size = event ? event.rows : this.rows;
 
-    this.jobService.getAllJobs(page, size).subscribe({
-      next: (response: PageResponse<Job>) => {
-        console.log(response)
+  this.jobService.getAllJobs(page, size).subscribe({
+    next: (response: PageResponse<Job>) => {
+      console.log('Jobs response:', response);
+      
+      // Process jobs and log logo information
+      this.jobs = response.content.map(job => {
+        const processedJob = {
+          ...job,
+          logoDataUrl: this.getCompanyLogoUrl(job)
+        };
+        
+        // Debug logging for each job
+        if (job.logoBase64 && job.logoContentType) {
+          console.log(`Job ${job.title} - Company ${job.companyName}: Has logo (${job.logoContentType}, ${job.logoBase64.length} chars)`);
+        } else {
+          console.log(`Job ${job.title} - Company ${job.companyName}: No logo data`);
+        }
+        
+        return processedJob;
+      });
+      
+      this.totalRecords = response.totalElements;
+      this.loading = false;
+    },
+    error: (error: any) => {
+      console.error('Error loading jobs:', error);
+      this.loading = false;
+    }
+  });
+}
 
-        this.jobs = response.content;
-        this.totalRecords = response.totalElements;
-        this.loading = false;
-      },
-      error: (error:any) => {
-        console.log(error)
-        console.error('Error loading jobs:', error);
-        this.loading = false;
+    getCompanyLogoUrl(job: Job): string {
+      if (job.logoBase64 && job.logoContentType) {
+        return `data:${job.logoContentType};base64,${job.logoBase64}`;
       }
-    });
-  }
+      return this.defaultLogoUrl;
+    }
+
+    // Method to check if job has a custom logo
+    hasCustomLogo(job: Job): boolean {
+      return !!(job.logoBase64 && job.logoContentType);
+    }
+
+    // Method to get company initials for fallback
+    getCompanyInitials(companyName: string): string {
+      return companyName
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .slice(0, 2)
+        .join('');
+    }
 
   onPageChange(event: any): void {
     this.first = event.first;
@@ -98,6 +136,32 @@ export class JobListComponent implements OnInit {
       .join(' ');
   }
   navigateTo(job:Job){
-    this.router.navigate(['/apply', job.jobId]);
+    this.router.navigate(['/job-detail', job.jobId]);
   }
+    onLogoError(event: any, job: Job): void {
+    console.warn(`Failed to load logo for ${job.companyName}:`, event);
+    // Hide the broken image and show fallback
+    event.target.style.display = 'none';
+    // You could also update the job object to mark the logo as invalid
+    job.logoDataUrl = undefined;
+  }
+
+  // // Optional: Add a method to retry logo loading
+  // retryLogoLoad(job: Job): void {
+  //   if (job.logoFileId) {
+  //     // You could implement a separate endpoint to refresh logo data
+  //     this.jobService.refreshJobLogo(job.jobId).subscribe({
+  //       next: (updatedJob) => {
+  //         const index = this.jobs.findIndex(j => j.jobId === job.jobId);
+  //         if (index !== -1) {
+  //           this.jobs[index] = { ...this.jobs[index], ...updatedJob };
+  //         }
+  //       },
+  //       error: (error) => {
+  //         console.error('Failed to refresh logo:', error);
+  //       }
+  //     });
+  //   }
+  // }
+
 }

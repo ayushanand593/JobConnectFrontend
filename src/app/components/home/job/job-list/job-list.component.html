@@ -33,9 +33,22 @@
     <div *ngFor="let job of jobs" class="job-card">
       <!-- Company Logo/Initial -->
       <div class="company-logo">
-        <div class="logo-placeholder">
-          {{ job.companyName.charAt(0).toUpperCase() }}{{ job.companyName.split(' ')[1] ? job.companyName.split(' ')[1].charAt(0).toUpperCase() : job.companyName.charAt(1).toUpperCase() }}
-        </div>
+
+      <div class="company-logo-container">
+      <img 
+        *ngIf="hasCustomLogo(job)" 
+        [src]="job.logoDataUrl" 
+        [alt]="job.companyName + ' logo'"
+        class="company-logo"
+        (error)="onLogoError($event, job)">
+      
+      <!-- Fallback logo with company initials -->
+      <div 
+        *ngIf="!hasCustomLogo(job)" 
+        class="company-logo-fallback">
+        {{ getCompanyInitials(job.companyName) }}
+      </div>
+    </div>
       </div>
 
       <!-- Job Content -->

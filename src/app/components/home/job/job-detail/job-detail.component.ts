@@ -1,0 +1,113 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Job } from 'src/app/interfaces/Job';
+import { JobService } from 'src/app/services/job.service';
+
+@Component({
+  selector: 'app-job-detail',
+  templateUrl: './job-detail.component.html',
+  styleUrls: ['./job-detail.component.scss']
+})
+
+export class JobDetailComponent implements OnInit {
+  job: Job | null = null;
+  loading = true;
+  error = false;
+  jobId: string = '';
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private jobService: JobService
+  ) {}
+
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.jobId = params['jobId'];
+      if (this.jobId) {
+        this.loadJobDetails();
+      }
+    });
+  }
+
+  loadJobDetails(): void {
+    this.loading = true;
+    this.error = false;
+    
+    this.jobService.getJobByJobId(this.jobId).subscribe({
+      next: (job: Job) => {
+        this.job = job;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error loading job details:', err);
+        this.error = true;
+        this.loading = false;
+      }
+    });
+  }
+
+  getCompanyInitials(companyName: string): string {
+    return companyName
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .join('')
+      .substring(0, 2);
+  }
+
+  formatSalary(salaryRange: string): string {
+    if (!salaryRange) return 'Not specified';
+    
+    // Handle range format like "6000-9000"
+    if (salaryRange.includes('-')) {
+      const [min, max] = salaryRange.split('-');
+      return `$${this.formatNumber(parseInt(min))} - $${this.formatNumber(parseInt(max))}`;
+    }
+    
+    // Handle single value like "1200000"
+    return `$${this.formatNumber(parseInt(salaryRange))}`;
+  }
+
+  private formatNumber(num: number): string {
+    return num.toLocaleString();
+  }
+
+  formatJobType(jobType: string): string {
+    return jobType.replace('_', ' ').toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  formatExperienceLevel(level: string | null): string {
+    if (!level) return '';
+    return level.replace('_', ' ').toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  getDaysAgo(dateString: string): string {
+    const jobDate = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - jobDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return 'Posted 1 day ago';
+    return `Posted ${diffDays} days ago`;
+  }
+
+  onApplyNow(): void {
+    if (this.job) {
+      // You can implement your apply logic here
+      console.log('Applying to job:', this.job.jobId);
+      // Example: this.jobService.applyToJob(this.job.jobId).subscribe(...);
+    }
+  }
+
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
+  
+
+}

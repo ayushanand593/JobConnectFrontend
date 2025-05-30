@@ -37,6 +37,63 @@
     }
   }
 
+
+
+.company-logo {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: contain; /* Maintains aspect ratio while fitting within bounds */
+  object-position: center;
+  border-radius: 8px;
+  background: #f8f9fa;
+  display: block;
+}
+.company-logo-cover {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: cover; /* Crops image to fill container */
+  object-position: center;
+  border-radius: 8px;
+  background: #f8f9fa;
+  display: block;
+}
+
+.company-logo-fallback {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* For different sizes, you can create utility classes */
+.logo-small {
+  width: 32px;
+  height: 32px;
+}
+
+.logo-medium {
+  width: 48px;
+  height: 48px;
+}
+
+.logo-large {
+  width: 64px;
+  height: 64px;
+}
+
   .loading-container {
     display: flex;
     justify-content: center;

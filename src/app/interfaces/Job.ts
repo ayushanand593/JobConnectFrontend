@@ -20,4 +20,10 @@ export interface Job {
   updatedAt: string;
   skills: Skill[];
   disclosureQuestions: DisclosureQuestion[];
+
+  logoFileId?: string;
+  logoBase64?: string;
+  logoContentType?: string;
+  logoFileName?: string;
+  logoDataUrl?: string;
 }

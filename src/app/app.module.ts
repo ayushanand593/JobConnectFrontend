@@ -17,6 +17,8 @@ import { ChipModule } from 'primeng/chip';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { PaginatorModule } from 'primeng/paginator';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TagModule } from 'primeng/tag';
+import { MessageModule } from 'primeng/message';
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -44,6 +46,7 @@ import { EmployeeregisterComponent } from './components/register/employeeregiste
 import { RegistrationService } from './services/registration.service';
 import { JobListComponent } from './components/home/job/job-list/job-list.component';
 import { JobService } from './services/job.service';
+import { JobDetailComponent } from './components/home/job/job-detail/job-detail.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -67,6 +70,11 @@ const routes: Routes = [
     component: EmployeeregisterComponent,
     canActivate: [GuestGuard]
   },
+  { 
+    path: 'job-detail/:jobId', 
+    component: JobDetailComponent,
+    canActivate: [AuthGuard]
+  },
   {
     path:'**',
     component:LoginComponent,
@@ -85,6 +93,7 @@ const routes: Routes = [
     CandidateregisterComponent,
     EmployeeregisterComponent,
     JobListComponent,
+    JobDetailComponent,
     
     
   ],
@@ -99,7 +108,7 @@ const routes: Routes = [
       anchorScrolling: 'enabled',       // optional—lets you jump to #anchors
       scrollOffset: [0, 0]             // optional—offset [x, y]
     
-    }),
+    }), 
     
     // PrimeNG Modules
     ButtonModule,
@@ -118,6 +127,8 @@ const routes: Routes = [
     InputNumberModule,
     PaginatorModule,
     ProgressSpinnerModule,
+    TagModule,
+    MessageModule,
   ],
   providers: [ 
     AuthGuard,
