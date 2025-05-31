@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Job } from 'src/app/interfaces/Job';
+import { JobSearchRequest } from 'src/app/interfaces/JobSearchRequest';
 import { PageResponse } from 'src/app/interfaces/PageResponse';
 import { JobService } from 'src/app/services/job.service';
 
@@ -11,102 +12,233 @@ import { JobService } from 'src/app/services/job.service';
   styleUrls: ['./job-list.component.scss']
 })
 export class JobListComponent implements OnInit {
-  jobs: Job[] = [];
+ jobs: Job[] = [];
   totalRecords: number = 0;
   loading: boolean = false;
   first: number = 0;
   rows: number = 10;
+  
+  // Search state
+  isSearchMode: boolean = false;
+  currentSearchRequest: JobSearchRequest = {};
   
   // Sort options
   sortOptions = [
     { label: 'Most Relevant', value: 'relevant' },
     { label: 'Newest First', value: 'newest' },
     { label: 'Oldest First', value: 'oldest' },
-    { label: 'Salary High to Low', value: 'salary_desc' },
-    { label: 'Salary Low to High', value: 'salary_asc' }
+    { label: 'Company A-Z', value: 'company_asc' },
+    { label: 'Company Z-A', value: 'company_desc' }
   ];
-  
-  selectedSort = 'relevant';
+  selectedSort = 'newest';
 
   defaultLogoUrl = 'assets/images/default-company-logo.png';
 
-  constructor(private jobService: JobService, private router:Router) {}
+  constructor(
+    private jobSearchService: JobService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    this.loadJobs();
+    // Check if there are search parameters in URL
+    this.route.queryParams.subscribe(params => {
+      if (Object.keys(params).length > 0) {
+        this.isSearchMode = true;
+        // Search will be triggered by the search component, so we just mark search mode
+      } else {
+        this.isSearchMode = false;
+        this.loadAllJobs();
+      }
+    });
   }
 
-   loadJobs(event?: any): void {
-  this.loading = true;
-  
-  const page = event ? event.first / event.rows : 0;
-  const size = event ? event.rows : this.rows;
+  // Handle search performed from the JobSearchComponent
+  onSearchPerformed(searchRequest: JobSearchRequest): void {
+    this.currentSearchRequest = { ...searchRequest };
+    this.isSearchMode = true;
+    this.first = 0; // Reset pagination
+    this.performSearch();
+  }
 
-  this.jobService.getAllJobs(page, size).subscribe({
-    next: (response: PageResponse<Job>) => {
-      console.log('Jobs response:', response);
-      
-      // Process jobs and log logo information
-      this.jobs = response.content.map(job => {
-        const processedJob = {
-          ...job,
-          logoDataUrl: this.getCompanyLogoUrl(job)
-        };
-        
-        // Debug logging for each job
-        if (job.logoBase64 && job.logoContentType) {
-          console.log(`Job ${job.title} - Company ${job.companyName}: Has logo (${job.logoContentType}, ${job.logoBase64.length} chars)`);
-        } else {
-          console.log(`Job ${job.title} - Company ${job.companyName}: No logo data`);
-        }
-        
-        return processedJob;
-      });
-      
-      this.totalRecords = response.totalElements;
-      this.loading = false;
-    },
-    error: (error: any) => {
-      console.error('Error loading jobs:', error);
-      this.loading = false;
-    }
-  });
-}
+  // Load all jobs (default view)
+  loadAllJobs(event?: any): void {
+    this.loading = true;
+    
+    const page = event ? event.first / event.rows : 0;
+    const size = event ? event.rows : this.rows;
 
-    getCompanyLogoUrl(job: Job): string {
-      if (job.logoBase64 && job.logoContentType) {
-        return `data:${job.logoContentType};base64,${job.logoBase64}`;
+    this.jobSearchService.getAllJobs(page, size).subscribe({
+      next: (response: PageResponse<Job>) => {
+        this.processJobsResponse(response);
+      },
+      error: (error: any) => {
+        console.error('Error loading jobs:', error);
+        this.loading = false;
       }
-      return this.defaultLogoUrl;
+    });
+  }
+
+  // Perform search with currentSearchRequest
+  performSearch(event?: any): void {
+    this.loading = true;
+    
+    // Update pagination if triggered by paginator
+    if (event) {
+      this.currentSearchRequest.page = event.first / event.rows;
+      this.currentSearchRequest.size = event.rows;
+    } else {
+      this.currentSearchRequest.page = 0;
+      this.currentSearchRequest.size = this.rows;
     }
 
-    // Method to check if job has a custom logo
-    hasCustomLogo(job: Job): boolean {
-      return !!(job.logoBase64 && job.logoContentType);
-    }
+    // Update sort parameters
+    this.updateSortParameters();
 
-    // Method to get company initials for fallback
-    getCompanyInitials(companyName: string): string {
-      return companyName
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase())
-        .slice(0, 2)
-        .join('');
-    }
+    this.jobSearchService.searchJobs(this.currentSearchRequest).subscribe({
+      next: (response: PageResponse<Job>) => {
+        this.processJobsResponse(response);
+      },
+      error: (error: any) => {
+        console.error('Error searching jobs:', error);
+        this.loading = false;
+      }
+    });
+  }
 
+  // Process the response from getAllJobs or searchJobs
+  private processJobsResponse(response: PageResponse<Job>): void {
+    console.log('Jobs response:', response);
+    
+    // Map each job to include a valid logo URL (or fallback)
+    this.jobs = response.content.map(job => {
+      const processedJob = {
+        ...job,
+        logoDataUrl: this.getCompanyLogoUrl(job)
+      };
+      
+      if (job.logoBase64 && job.logoContentType) {
+        console.log(`Job ${job.title} - Company ${job.companyName}: Has logo (${job.logoContentType})`);
+      } else {
+        console.log(`Job ${job.title} - Company ${job.companyName}: No logo data, using default`);
+      }
+      
+      return processedJob;
+    });
+    
+    this.totalRecords = response.totalElements;
+    this.loading = false;
+  }
+
+  // Figure out the correct URL (data:base64 or fallback asset) for each company logo
+  getCompanyLogoUrl(job: Job): string {
+    if (job.logoBase64 && job.logoContentType) {
+      return `data:${job.logoContentType};base64,${job.logoBase64}`;
+    }
+    return this.defaultLogoUrl;
+  }
+
+  hasCustomLogo(job: Job): boolean {
+    return !!(job.logoBase64 && job.logoContentType);
+  }
+
+  // Create “AB” from “Acme Business”
+  getCompanyInitials(companyName: string): string {
+    return companyName
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('');
+  }
+
+  // Called when paginator is used
   onPageChange(event: any): void {
     this.first = event.first;
     this.rows = event.rows;
-    this.loadJobs(event);
+    
+    if (this.isSearchMode) {
+      this.performSearch(event);
+    } else {
+      this.loadAllJobs(event);
+    }
   }
 
+  // Called when sort dropdown changes
   onSortChange(): void {
-    // Implement sorting logic here
-    // You might need to modify your backend API to support sorting
-    this.loadJobs();
+    this.first = 0; // Reset to page 1 when sorting
+    
+    if (this.isSearchMode) {
+      this.performSearch();
+    } else {
+      // Switch to “search mode” even if criteria is empty, to handle sorting on backend
+      this.currentSearchRequest = { page: 0, size: this.rows };
+      this.isSearchMode = true;
+      this.performSearch();
+    }
   }
 
-  getTimeAgo(dateString: string): string {
+  // Map selectedSort → sortBy & sortDirection on currentSearchRequest
+  private updateSortParameters(): void {
+    switch (this.selectedSort) {
+      case 'newest':
+        this.currentSearchRequest.sortBy = 'createdAt';
+        this.currentSearchRequest.sortDirection = 'DESC';
+        break;
+      case 'oldest':
+        this.currentSearchRequest.sortBy = 'createdAt';
+        this.currentSearchRequest.sortDirection = 'ASC';
+        break;
+      case 'company_asc':
+        this.currentSearchRequest.sortBy = 'companyName';
+        this.currentSearchRequest.sortDirection = 'ASC';
+        break;
+      case 'company_desc':
+        this.currentSearchRequest.sortBy = 'companyName';
+        this.currentSearchRequest.sortDirection = 'DESC';
+        break;
+      default:
+        this.currentSearchRequest.sortBy = 'createdAt';
+        this.currentSearchRequest.sortDirection = 'DESC';
+    }
+  }
+
+  // Clear search and return to all-jobs view
+  clearSearch(): void {
+    this.isSearchMode = false;
+    this.currentSearchRequest = {};
+    this.first = 0; // reset paginator to first page
+
+    // Clear URL parameters
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+    });
+
+    // Load all jobs again since we're no longer in search mode
+    this.loadAllJobs();
+  }
+
+  // (Optional helper) Show a small “search summary” string in your template
+  getSearchSummary(): string {
+    if (!this.isSearchMode) return '';
+    
+    const parts = [];
+    if (this.currentSearchRequest.jobTitle) {
+      parts.push(`Title: "${this.currentSearchRequest.jobTitle}"`);
+    }
+    if (this.currentSearchRequest.location) {
+      parts.push(`Location: "${this.currentSearchRequest.location}"`);
+    }
+    if (this.currentSearchRequest.companyName) {
+      parts.push(`Company: "${this.currentSearchRequest.companyName}"`);
+    }
+    if (this.currentSearchRequest.skills && this.currentSearchRequest.skills.length > 0) {
+      parts.push(`Skills: ${this.currentSearchRequest.skills.join(', ')}`);
+    }
+    
+    return parts.length > 0 ? `Searching for: ${parts.join(' | ')}` : 'Advanced search applied';
+  }
+    getTimeAgo(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();

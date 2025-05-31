@@ -1,3 +1,7 @@
+<app-job-search
+  (searchPerformed)="onSearchPerformed($event)">
+</app-job-search>
+
 <!-- job-list.component.html -->
 <div class="job-list-container">
   <!-- Header Section -->
@@ -29,8 +33,8 @@
   </div>
 
   <!-- Job Cards -->
-  <div *ngIf="!loading" class="job-cards">
-    <div *ngFor="let job of jobs" class="job-card">
+  <div *ngIf="!loading" class="job-cards" >
+    <div *ngFor="let job of jobs" class="job-card" (click)="navigateTo(job)">
       <!-- Company Logo/Initial -->
       <div class="company-logo">
 
@@ -108,7 +112,7 @@
             label="Apply Now" 
             icon="pi pi-send"
             styleClass="apply-button"
-            (onClick)="navigateTo(job)">
+            >
           </p-button>
         </div>
       </div>

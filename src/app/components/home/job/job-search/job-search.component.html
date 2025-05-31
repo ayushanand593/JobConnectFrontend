@@ -1,0 +1,151 @@
+<!-- job-search.component.html -->
+<div class="job-search-container">
+  <!-- Main Search Header -->
+  <div class="search-header">
+    <h1>Find Your Dream Job Today</h1>
+    
+    <!-- Basic Search Row -->
+    <div class="search-row">
+      <div class="search-input-group">
+        <span class="p-input-icon-left search-field">
+          <i class="pi pi-search"></i>
+          <input 
+            type="text" 
+            pInputText 
+            placeholder="Job title or keyword"
+            [(ngModel)]="searchRequest.jobTitle"
+            (keyup.enter)="performSearch()"
+            class="search-input">
+        </span>
+
+        <span class="p-input-icon-left search-field">
+          <i class="pi pi-map-marker"></i>
+          <input 
+            type="text" 
+            pInputText 
+            placeholder="Location"
+            [(ngModel)]="searchRequest.location"
+            (keyup.enter)="performSearch()"
+            class="search-input">
+        </span>
+
+        <p-button 
+          label="Search Jobs" 
+          icon="pi pi-search"
+          styleClass="search-button"
+          (onClick)="performSearch()">
+        </p-button>
+      </div>
+
+      <!-- Advanced Search Toggle -->
+      <div class="advanced-toggle">
+        <p-button 
+          [label]="showAdvancedSearch ? 'Hide Advanced' : 'Advanced Search'"
+          icon="pi pi-cog"
+          styleClass="p-button-outlined advanced-button"
+          (onClick)="toggleAdvancedSearch()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Search Panel -->
+  <div class="advanced-search-panel" [class.show]="showAdvancedSearch">
+    <p-panel header="Advanced Search Options" [toggleable]="false">
+      <div class="advanced-grid">
+        
+        <!-- Company Name -->
+        <div class="field">
+          <label for="companyName">Company Name</label>
+          <input 
+            id="companyName"
+            type="text" 
+            pInputText 
+            placeholder="Enter company name"
+            [(ngModel)]="searchRequest.companyName"
+            class="full-width">
+        </div>
+
+        <!-- Job Type -->
+        <div class="field">
+          <label for="jobType">Job Type</label>
+          <p-dropdown 
+            id="jobType"
+            [options]="jobTypeOptions"
+            [(ngModel)]="searchRequest.jobType"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select job type"
+            class="full-width">
+          </p-dropdown>
+        </div>
+
+        <!-- Experience Level -->
+        <div class="field">
+          <label for="experienceLevel">Experience Level</label>
+          <p-dropdown 
+            id="experienceLevel"
+            [options]="experienceLevelOptions"
+            [(ngModel)]="searchRequest.experienceLevel"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select experience level"
+            class="full-width">
+          </p-dropdown>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="field skills-section">
+          <label for="skills">Skills</label>
+          <div class="skills-input-container">
+            <div class="skill-input-wrapper">
+              <input 
+                id="skills"
+                type="text" 
+                pInputText 
+                placeholder="Type a skill and press Enter"
+                [(ngModel)]="skillInput"
+                (keypress)="onSkillKeyPress($event)"
+                class="skill-input">
+              <p-button 
+                icon="pi pi-plus"
+                styleClass="p-button-outlined add-skill-btn"
+                (onClick)="addSkill()"
+                [disabled]="!skillInput.trim()">
+              </p-button>
+            </div>
+            
+            <!-- Selected Skills -->
+            <div class="selected-skills" *ngIf="selectedSkills.length > 0">
+              <p-chip 
+                *ngFor="let skill of selectedSkills" 
+                [label]="skill"
+                [removable]="true"
+                (onRemove)="removeSkill(skill)"
+                styleClass="skill-chip">
+              </p-chip>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="search-actions">
+        <p-button 
+          label="Search" 
+          icon="pi pi-search"
+          styleClass="search-btn"
+          (onClick)="performSearch()">
+        </p-button>
+        
+        <p-button 
+          label="Clear All" 
+          icon="pi pi-times"
+          styleClass="p-button-outlined clear-btn"
+          (onClick)="clearSearch()">
+        </p-button>
+      </div>
+    </p-panel>
+  </div>
+</div>

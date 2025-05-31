@@ -19,6 +19,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 import { MessageModule } from 'primeng/message';
+import { PanelModule } from 'primeng/panel';
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -47,6 +48,7 @@ import { RegistrationService } from './services/registration.service';
 import { JobListComponent } from './components/home/job/job-list/job-list.component';
 import { JobService } from './services/job.service';
 import { JobDetailComponent } from './components/home/job/job-detail/job-detail.component';
+import { JobSearchComponent } from './components/home/job/job-search/job-search.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -94,6 +96,7 @@ const routes: Routes = [
     EmployeeregisterComponent,
     JobListComponent,
     JobDetailComponent,
+    JobSearchComponent,
     
     
   ],
@@ -129,6 +132,7 @@ const routes: Routes = [
     ProgressSpinnerModule,
     TagModule,
     MessageModule,
+    PanelModule,
   ],
   providers: [ 
     AuthGuard,
