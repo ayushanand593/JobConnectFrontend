@@ -140,6 +140,7 @@ export class CandidateComponent {
   openUpdateProfileDialog(): void {
     if (this.candidateProfile) {
       this.populateProfileForm(this.candidateProfile);
+      this.skillsArray = this.candidateProfile.skills ? this.candidateProfile.skills.map(skill => skill.name) : [];
     }
     this.showUpdateProfileDialog = true;
   }
@@ -169,7 +170,7 @@ export class CandidateComponent {
         summary: formValue.summary,
         experienceYears: formValue.experienceYears,
         resumeUrl: '', // Not used in current implementation
-        skills: this.skillsArray || []
+        skills: this.skillsArray
       };
 
       this.candidateService.updateCandidateProfile(updateData).subscribe({
