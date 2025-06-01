@@ -1,9 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { PageResponse } from '../interfaces/PageResponse';
 import { Job } from '../interfaces/Job';
 import { JobSearchRequest } from '../interfaces/JobSearchRequest';
+import { DisclosureQuestion } from '../interfaces/DisclosureQuestion';
+import { JobDisclosureQuestionsDTO } from '../interfaces/JobDisclosureQuestionsDTO';
+import { JobApplicationSubmissionDTO } from '../interfaces/JobApplicationSubmissionDTO';
+import { JobApplicationDTO } from '../interfaces/JobApplicationDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +30,44 @@ private apiUrl = 'http://localhost:8080/api/jobs'; // Adjust base URL as needed
   }
   searchJobs(searchRequest: JobSearchRequest): Observable<PageResponse<Job>> {
     return this.http.post<PageResponse<Job>>(`${this.apiUrl}/search`, searchRequest);
+  }
+   getJobDisclosureQuestions(jobId: string): Observable<DisclosureQuestion[]> {
+    return this.http
+      .get<JobDisclosureQuestionsDTO>(`${this.apiUrl}/${jobId}/disclosure-questions`)
+      .pipe(
+        // Pull out the `disclosureQuestions` field from the wrapper object
+        map((wrapper) => wrapper.disclosureQuestions || [])
+      );
+  }
+
+  // Add new method that returns the full DTO
+  getJobDisclosureQuestionsRaw(jobId: string): Observable<JobDisclosureQuestionsDTO> {
+    return this.http.get<JobDisclosureQuestionsDTO>(`${this.apiUrl}/${jobId}/disclosure-questions`);
+  }
+
+  applyToJob(
+    jobId: string, 
+    applicationData: JobApplicationSubmissionDTO,
+    resumeFile?: File,
+    coverLetterFile?: File
+  ): Observable<JobApplicationDTO> {
+    const formData = new FormData();
+    
+    // Add application data as JSON
+    formData.append('applicationData', new Blob([JSON.stringify(applicationData)], {
+      type: 'application/json'
+    }));
+    
+    // Add files if provided
+    if (resumeFile) {
+      formData.append('resumeFile', resumeFile);
+    }
+    
+    if (coverLetterFile) {
+      formData.append('coverLetterFile', coverLetterFile);
+    }
+    
+    return this.http.post<JobApplicationDTO>(`${this.apiUrl}/apply/${jobId}`, formData);
   }
 
   // Search jobs using GET method (for simple search with query parameters)

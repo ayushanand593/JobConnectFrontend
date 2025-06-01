@@ -1,0 +1,182 @@
+<div class="job-apply-container" *ngIf="!loading">
+  <!-- Header with Back Button -->
+  <div class="header-section">
+    <button 
+      type="button" 
+      class="back-button"
+      (click)="onCancel()">
+      <i class="pi pi-arrow-left"></i>
+      Back to Job
+    </button>
+    
+    <h1 class="page-title">Apply for Position</h1>
+  </div>
+
+  <!-- Job Information Header -->
+  <div class="job-header" *ngIf="job">
+    <div class="job-header-content">
+      <div class="company-logo">
+  <ng-container *ngIf="job?.logoDataUrl; else showInitials">
+    <img [src]="job.logoDataUrl" [alt]="job.companyName + ' logo'" class="company-logo" />
+  </ng-container>
+  <ng-template #showInitials>
+    <div class="company-initials" 
+         [style.background-image]="'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)'">
+      {{ getCompanyInitials(job.companyName) }}
+    </div>
+  </ng-template>
+</div>
+      <div class="job-info">
+        <h2 class="job-title">{{ job.title }}</h2>
+        <p class="company-name">{{ job.companyName }}</p>
+        <div class="job-details">
+          <span class="location">
+            <i class="pi pi-map-marker"></i>
+            {{ job.location }}
+          </span>
+          <span class="job-type">
+            <i class="pi pi-clock"></i>
+            {{ job.jobType }}
+          </span>
+          <span class="salary" *ngIf="job.salaryRange">
+            <i class="pi pi-dollar"></i>
+            {{ job.salaryRange}}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Form -->
+  <form [formGroup]="applicationForm" (ngSubmit)="onSubmitApplication()" class="application-form">
+    
+    <!-- Resume Section -->
+    <div class="form-section">
+      <h3>Resume</h3>
+      <div class="resume-options">
+        <div class="checkbox-wrapper">
+          <p-checkbox 
+            formControlName="useExistingResume"
+            [binary]="true"
+            inputId="useExistingResume">
+          </p-checkbox>
+          <label for="useExistingResume">Use my existing resume from profile</label>
+        </div>
+        
+        <div class="divider">OR</div>
+        
+        <div class="file-upload-section">
+          <label>Upload New Resume</label>
+          <p-fileUpload 
+            mode="basic"
+            chooseLabel="Choose Resume"
+            [maxFileSize]="maxFileSize"
+            [accept]="allowedFileTypes.join(',')"
+            (onSelect)="onResumeSelect($event)"
+            (onRemove)="onResumeRemove()"
+            [auto]="false">
+          </p-fileUpload>
+          <small>Accepted formats: PDF, DOC, DOCX, TXT (Max 5MB)</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cover Letter Section -->
+    <div class="form-section">
+      <h3>Cover Letter (Optional)</h3>
+      <div class="file-upload-section">
+        <label>Upload Cover Letter</label>
+        <p-fileUpload 
+          mode="basic"
+          chooseLabel="Choose Cover Letter"
+          [maxFileSize]="maxFileSize"
+          [accept]="allowedFileTypes.join(',')"
+          (onSelect)="onCoverLetterSelect($event)"
+          (onRemove)="onCoverLetterRemove()"
+          [auto]="false">
+        </p-fileUpload>
+        <small>Accepted formats: PDF, DOC, DOCX, TXT (Max 5MB)</small>
+      </div>
+    </div>
+
+    <!-- Disclosure Questions Section -->
+    <div class="form-section" *ngIf="disclosureQuestions.length > 0">
+      <h3>Additional Questions</h3>
+      <div formArrayName="disclosureAnswers">
+        <div 
+          *ngFor="let question of disclosureQuestions; let i = index" 
+          class="disclosure-question"
+          [formGroupName]="i">
+          
+          <label [for]="'question-' + i" class="question-label">
+            {{ question.questionText }}
+            <span class="required-asterisk" *ngIf="question.isRequired">*</span>
+          </label>
+          
+          <textarea 
+            [id]="'question-' + i"
+            formControlName="answerText"
+            class="question-input"
+            [class.error]="isDisclosureAnswerInvalid(i)"
+            rows="3"
+            placeholder="Please provide your answer...">
+          </textarea>
+          
+          <small 
+            class="error-message" 
+            *ngIf="isDisclosureAnswerInvalid(i)">
+            This field is required
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voluntary Self-Identification Section -->
+    <div class="form-section voluntary-section">
+      <h3>Voluntary Self-Identification (Optional)</h3>
+      
+      <div class="info-box">
+        <i class="pi pi-info-circle"></i>
+        <p>This information is voluntary and will be kept confidential. It is used for compliance and diversity reporting purposes only.</p>
+      </div>
+      
+      <div class="voluntary-disclosure">
+        <label for="voluntaryDisclosures">Additional Information</label>
+        <textarea 
+          id="voluntaryDisclosures"
+          formControlName="voluntaryDisclosures"
+          class="voluntary-input"
+          rows="4"
+          placeholder="You may provide any additional voluntary self-identification information...">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="cancel-button"
+        (click)="onCancel()">
+        Cancel
+      </button>
+      
+      <button 
+        type="submit" 
+        class="submit-button"
+        [disabled]="submitting || !applicationForm.valid">
+        <i class="pi pi-send" *ngIf="!submitting"></i>
+        <i class="pi pi-spinner pi-spin" *ngIf="submitting"></i>
+        {{ submitting ? 'Submitting...' : 'Submit Application' }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="loading">
+  <p-progressSpinner></p-progressSpinner>
+  <p>Loading job information...</p>
+</div>
+
+<!-- CSS Styles -->

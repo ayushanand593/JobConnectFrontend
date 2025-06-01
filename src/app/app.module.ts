@@ -25,6 +25,8 @@ import { TableModule } from 'primeng/table';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { SkeletonModule } from 'primeng/skeleton';
+import { DividerModule } from 'primeng/divider';
+import { RadioButtonModule } from 'primeng/radiobutton';
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -56,6 +58,7 @@ import { JobDetailComponent } from './components/home/job/job-detail/job-detail.
 import { JobSearchComponent } from './components/home/job/job-search/job-search.component';
 import { CandidateComponent } from './components/profile/candidate/candidate.component';
 import { CandidateService } from './services/candidate-service.service';
+import { JobApplyComponent } from './components/home/job/job-apply/job-apply.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -83,6 +86,11 @@ const routes: Routes = [
     path: 'job-detail/:jobId', 
     component: JobDetailComponent,
     canActivate: [AuthGuard]
+  },
+    {
+    path: 'jobs/:jobId/apply',
+    component: JobApplyComponent,
+    canActivate: [AuthGuard] // Assuming you have authentication
   },
    {
     path: 'candidate',
@@ -125,6 +133,7 @@ const routes: Routes = [
     JobDetailComponent,
     JobSearchComponent,
     CandidateComponent,
+    JobApplyComponent,
     
     
   ],
@@ -165,7 +174,9 @@ const routes: Routes = [
     FileUploadModule,
     InputTextareaModule,
     TableModule,
-    TabViewModule
+    TabViewModule,
+    DividerModule,
+    RadioButtonModule
   ],
   providers: [ 
     AuthGuard,

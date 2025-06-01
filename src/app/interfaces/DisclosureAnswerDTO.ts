@@ -1,5 +1,5 @@
 export interface DisclosureAnswerDTO {
   questionId: number;
-  questionText: string;
+  questionText?: string;
   answerText: string;
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { Job } from 'src/app/interfaces/Job';
 import { JobService } from 'src/app/services/job.service';
 
@@ -18,7 +19,8 @@ export class JobDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private jobService: JobService
+    private jobService: JobService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -98,12 +100,19 @@ export class JobDetailComponent implements OnInit {
   }
 
   onApplyNow(): void {
-    if (this.job) {
-      // You can implement your apply logic here
-      console.log('Applying to job:', this.job.jobId);
-      // Example: this.jobService.applyToJob(this.job.jobId).subscribe(...);
-    }
+  if (this.job) {
+    console.log('Applying to job:', this.job.jobId);
+    
+    // Navigate to job application page with jobId
+    this.router.navigate(['/jobs', this.job.jobId, 'apply']);
+  } else {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Job information not available'
+    });
   }
+}
 
   goBack(): void {
     this.router.navigate(['/']);
