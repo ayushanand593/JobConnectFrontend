@@ -1,0 +1,592 @@
+/* candidate-dashboard.component.scss */
+
+.candidate-dashboard {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .dashboard-header {
+    margin-bottom: 2rem;
+    text-align: center;
+
+    h2 {
+      color: #2c3e50;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      
+      .pi {
+        color: #3498db;
+      }
+    }
+
+    .dashboard-subtitle {
+      color: #7f8c8d;
+      font-size: 1rem;
+      margin: 0;
+    }
+  }
+
+  // Custom TabView Styles
+  .custom-tabview {
+    .p-tabview-nav {
+      background: #f8f9fa;
+      border-radius: 8px 8px 0 0;
+      
+      li {
+        .p-tabview-nav-link {
+          background: transparent;
+          border: none;
+          padding: 1rem 1.5rem;
+          font-weight: 500;
+          color: #6c757d;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+          }
+
+          .pi {
+            margin-right: 0.5rem;
+          }
+        }
+
+        &.p-highlight .p-tabview-nav-link {
+          background: #3498db;
+          color: white;
+          border-radius: 6px;
+        }
+      }
+    }
+
+    .p-tabview-panels {
+      background: white;
+      padding: 2rem;
+      border-radius: 0 0 8px 8px;
+    }
+  }
+
+  // Dashboard Stats Cards
+  .stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    &.total-applications {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    &.pending-applications {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    &.reviewed-applications {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    &.accepted-applications {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .stat-icon {
+      font-size: 2.5rem;
+      margin-right: 1rem;
+      opacity: 0.8;
+    }
+
+    .stat-content {
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Recent Applications Section
+  .recent-applications-section {
+    margin-top: 2.5rem;
+
+    h3 {
+      color: #2c3e50;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      
+      .pi {
+        color: #3498db;
+      }
+    }
+  }
+
+  // Profile Content
+  .profile-content {
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      h3 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        
+        .pi {
+          color: #3498db;
+        }
+      }
+
+      .profile-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+    }
+
+    .profile-grid {
+      .profile-field {
+        margin-bottom: 1.5rem;
+
+        .field-label {
+          display: block;
+          font-weight: 600;
+          color: #34495e;
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .field-value {
+          color: #2c3e50;
+          font-size: 1rem;
+          line-height: 1.5;
+          margin: 0;
+          padding: 0.75rem;
+          background: #f8f9fa;
+          border-radius: 6px;
+          border-left: 4px solid #3498db;
+
+          &.summary-text {
+            white-space: pre-wrap;
+            line-height: 1.6;
+          }
+
+          &.no-data {
+            color: #7f8c8d;
+            font-style: italic;
+          }
+
+          .pi {
+            color: #3498db;
+          }
+        }
+
+        .skill-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+
+          .skill-tag {
+            margin: 0;
+          }
+        }
+
+
+        .resume-info {
+          display: flex;
+          align-items: center;
+          
+          .pi-file-pdf {
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+  }
+
+  // Applications Content
+  .applications-content {
+    .applications-header {
+      margin-bottom: 2rem;
+
+      h3 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        
+        .pi {
+          color: #3498db;
+        }
+      }
+
+      .applications-subtitle {
+        color: #7f8c8d;
+        margin: 0;
+      }
+    }
+  }
+
+  // Custom Table Styles
+  .custom-table {
+    .p-datatable-header {
+      background: #f8f9fa;
+      border: none;
+      padding: 1rem;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: #34495e;
+      color: white;
+      font-weight: 600;
+      border: none;
+      padding: 1rem;
+    }
+
+    .p-datatable-tbody > tr {
+      &:nth-child(even) {
+        background: #f8f9fa;
+      }
+
+      &:hover {
+        background: #e3f2fd !important;
+      }
+
+      td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #ecf0f1;
+      }
+    }
+
+    .job-title {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .company-name {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+
+    .application-date, .last-updated {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+
+    .job-details {
+      .job-id {
+        color: #7f8c8d;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+      }
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      
+      .file-name {
+        font-size: 0.85rem;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .no-file {
+      color: #bdc3c7;
+    }
+  }
+
+  // Empty State
+  .empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #7f8c8d;
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #bdc3c7;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    small {
+      font-size: 0.9rem;
+    }
+  }
+
+  // Dialog Styles
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 1rem;
+  }
+
+  .field {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #34495e;
+      margin-bottom: 0.5rem;
+    }
+
+    .p-error {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+    }
+
+    input, textarea {
+      width: 100%;
+    }
+
+    .ng-invalid.ng-touched {
+      border-color: #e74c3c;
+    }
+    .skills-container {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-height: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.skill-tag {
+  background-color: #007bff;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.skill-tag:hover {
+  background-color: #0056b3;
+}
+
+.skill-input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 120px;
+}
+  }
+
+  // Upload Dialog
+  .upload-content {
+    .upload-description {
+      color: #7f8c8d;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .selected-file {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+
+      .file-preview {
+        display: flex;
+        align-items: center;
+        
+        .pi {
+          color: #e74c3c;
+          font-size: 1.2rem;
+        }
+
+        .file-size {
+          color: #7f8c8d;
+          font-size: 0.85rem;
+          margin-left: auto;
+        }
+      }
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+
+    .card {
+      padding: 1rem;
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .stat-card {
+      padding: 1rem;
+      
+      .stat-icon {
+        font-size: 2rem;
+        margin-right: 0.75rem;
+      }
+
+      .stat-content .stat-number {
+        font-size: 1.5rem;
+      }
+    }
+
+    .profile-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .custom-tabview .p-tabview-panels {
+      padding: 1rem;
+    }
+
+    // Make dialogs responsive
+    :host ::ng-deep .p-dialog {
+      width: 95vw !important;
+      max-width: none !important;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .applications-content .custom-table {
+      font-size: 0.85rem;
+      
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+
+    .skill-tags {
+      .skill-tag {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+// Global PrimeNG Overrides
+:host ::ng-deep {
+  .p-tag {
+    font-weight: 500;
+    
+    &.p-tag-success {
+      background: #27ae60;
+    }
+    
+    &.p-tag-danger {
+      background: #e74c3c;
+    }
+    
+    &.p-tag-info {
+      background: #3498db;
+    }
+    
+    &.p-tag-warning {
+      background: #f39c12;
+    }
+  }
+
+  .p-button {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  .p-inputtext, .p-inputtextarea {
+    border-radius: 6px;
+    border: 2px solid #dee2e6;
+    
+    &:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+  }
+
+  .p-chips {
+    .p-chips-multiple-container {
+      border-radius: 6px;
+      border: 2px solid #dee2e6;
+      
+      &:focus-within {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+      }
+    }
+
+    .p-chips-token {
+      background: #3498db;
+      color: white;
+      border-radius: 4px;
+    }
+  }
+
+  .p-fileupload {
+    .p-button {
+      background: #3498db;
+      border-color: #3498db;
+    }
+  }
+
+  .p-toast {
+    .p-toast-message {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+}

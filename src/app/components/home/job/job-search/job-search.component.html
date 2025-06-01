@@ -1,12 +1,13 @@
-<!-- job-search.component.html -->
 <div class="job-search-container">
-  <!-- Main Search Header -->
+  <!-- ─── MAIN SEARCH HEADER ─────────────────────────────────────────────────── -->
   <div class="search-header">
     <h1>Find Your Dream Job Today</h1>
-    
-    <!-- Basic Search Row -->
+
+    <!-- ─── BASIC SEARCH ROW ──────────────────────────────────────────────────── -->
     <div class="search-row">
       <div class="search-input-group">
+
+        <!-- === Job Title / Keyword === -->
         <span class="p-input-icon-left search-field">
           <i class="pi pi-search"></i>
           <input 
@@ -14,10 +15,11 @@
             pInputText 
             placeholder="Job title or keyword"
             [(ngModel)]="searchRequest.jobTitle"
-            (keyup.enter)="performSearch()"
+            (ngModelChange)="onTitleInput($event)"
             class="search-input">
         </span>
 
+        <!-- === Location === -->
         <span class="p-input-icon-left search-field">
           <i class="pi pi-map-marker"></i>
           <input 
@@ -25,10 +27,11 @@
             pInputText 
             placeholder="Location"
             [(ngModel)]="searchRequest.location"
-            (keyup.enter)="performSearch()"
+            (ngModelChange)="onLocationInput($event)"
             class="search-input">
         </span>
 
+        <!-- Optional: Manual “Search Jobs” button (in case user prefers click) -->
         <p-button 
           label="Search Jobs" 
           icon="pi pi-search"
@@ -37,7 +40,7 @@
         </p-button>
       </div>
 
-      <!-- Advanced Search Toggle -->
+      <!-- === Advanced Search Toggle === -->
       <div class="advanced-toggle">
         <p-button 
           [label]="showAdvancedSearch ? 'Hide Advanced' : 'Advanced Search'"
@@ -49,12 +52,12 @@
     </div>
   </div>
 
-  <!-- Advanced Search Panel -->
+  <!-- ─── ADVANCED SEARCH PANEL ───────────────────────────────────────────────── -->
   <div class="advanced-search-panel" [class.show]="showAdvancedSearch">
     <p-panel header="Advanced Search Options" [toggleable]="false">
       <div class="advanced-grid">
-        
-        <!-- Company Name -->
+
+        <!-- === Company Name === -->
         <div class="field">
           <label for="companyName">Company Name</label>
           <input 
@@ -63,10 +66,11 @@
             pInputText 
             placeholder="Enter company name"
             [(ngModel)]="searchRequest.companyName"
+            (ngModelChange)="onCompanyInput($event)"
             class="full-width">
         </div>
 
-        <!-- Job Type -->
+        <!-- === Job Type === -->
         <div class="field">
           <label for="jobType">Job Type</label>
           <p-dropdown 
@@ -76,11 +80,12 @@
             optionLabel="label"
             optionValue="value"
             placeholder="Select job type"
-            class="full-width">
+            class="full-width"
+            (onChange)="onJobTypeChange($event.value)">
           </p-dropdown>
         </div>
 
-        <!-- Experience Level -->
+        <!-- === Experience Level === -->
         <div class="field">
           <label for="experienceLevel">Experience Level</label>
           <p-dropdown 
@@ -90,11 +95,12 @@
             optionLabel="label"
             optionValue="value"
             placeholder="Select experience level"
-            class="full-width">
+            class="full-width"
+            (onChange)="onExperienceChange($event.value)">
           </p-dropdown>
         </div>
 
-        <!-- Skills Section -->
+        <!-- === Skills Section === -->
         <div class="field skills-section">
           <label for="skills">Skills</label>
           <div class="skills-input-container">
@@ -115,7 +121,7 @@
               </p-button>
             </div>
             
-            <!-- Selected Skills -->
+            <!-- Show selected skills as removable chips -->
             <div class="selected-skills" *ngIf="selectedSkills.length > 0">
               <p-chip 
                 *ngFor="let skill of selectedSkills" 
@@ -130,8 +136,9 @@
 
       </div>
 
-      <!-- Action Buttons -->
+      <!-- ─── ADVANCED SEARCH ACTION BUTTONS ──────────────────────────────────── -->
       <div class="search-actions">
+        <!-- Optional: you can keep a “Search” button here -->
         <p-button 
           label="Search" 
           icon="pi pi-search"

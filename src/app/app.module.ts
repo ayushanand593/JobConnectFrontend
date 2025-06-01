@@ -20,6 +20,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 import { MessageModule } from 'primeng/message';
 import { PanelModule } from 'primeng/panel';
+import { TabViewModule } from 'primeng/tabview';
+import { TableModule } from 'primeng/table';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { FileUploadModule } from 'primeng/fileupload';
+import { SkeletonModule } from 'primeng/skeleton';
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -49,6 +54,8 @@ import { JobListComponent } from './components/home/job/job-list/job-list.compon
 import { JobService } from './services/job.service';
 import { JobDetailComponent } from './components/home/job/job-detail/job-detail.component';
 import { JobSearchComponent } from './components/home/job/job-search/job-search.component';
+import { CandidateComponent } from './components/profile/candidate/candidate.component';
+import { CandidateService } from './services/candidate-service.service';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -77,6 +84,26 @@ const routes: Routes = [
     component: JobDetailComponent,
     canActivate: [AuthGuard]
   },
+   {
+    path: 'candidate',
+    children: [
+      {
+        path: 'dashboard',
+        component: CandidateComponent,
+        data: { title: 'Candidate Dashboard' }
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
+  },
+  {
+    path: '',
+    redirectTo: '/candidate/dashboard',
+    pathMatch: 'full'
+  },
   {
     path:'**',
     component:LoginComponent,
@@ -97,6 +124,7 @@ const routes: Routes = [
     JobListComponent,
     JobDetailComponent,
     JobSearchComponent,
+    CandidateComponent,
     
     
   ],
@@ -133,6 +161,11 @@ const routes: Routes = [
     TagModule,
     MessageModule,
     PanelModule,
+    SkeletonModule,
+    FileUploadModule,
+    InputTextareaModule,
+    TableModule,
+    TabViewModule
   ],
   providers: [ 
     AuthGuard,
@@ -140,6 +173,7 @@ const routes: Routes = [
     AuthService,
     RegistrationService,
     JobService,
+    CandidateService,
     MessageService,
     ConfirmationService,
     {

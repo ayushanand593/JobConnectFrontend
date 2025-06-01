@@ -1,6 +1,8 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JobSearchRequest } from 'src/app/interfaces/JobSearchRequest';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-job-search',
@@ -42,16 +44,79 @@ export class JobSearchComponent implements OnInit {
     { label: 'Lead/Manager', value: 'LEAD' }
   ];
 
+   private titleSubject: Subject<string> = new Subject<string>();
+  private locationSubject: Subject<string> = new Subject<string>();
+  private companySubject: Subject<string> = new Subject<string>();
+  private skillsSubject: Subject<string[]> = new Subject<string[]>();
+
   constructor(
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    // Load search parameters from URL if available
+    // 1) If the URL already has queryParams, prefill them and immediately emit.
     this.loadSearchFromUrl();
+
+    // 2) Debounced “Job Title” changes
+    this.titleSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe((value: string) => {
+        this.searchRequest.jobTitle = value || undefined;
+        this.searchRequest.page = 0;
+        this.updateUrlWithSearchParams();
+        this.searchPerformed.emit({ ...this.searchRequest });
+      });
+
+    // 3) Debounced “Location” changes
+    this.locationSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe((value: string) => {
+        this.searchRequest.location = value || undefined;
+        this.searchRequest.page = 0;
+        this.updateUrlWithSearchParams();
+        this.searchPerformed.emit({ ...this.searchRequest });
+      });
+
+    // 4) Debounced “Company Name” changes
+    this.companySubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe((value: string) => {
+        this.searchRequest.companyName = value || undefined;
+        this.searchRequest.page = 0;
+        this.updateUrlWithSearchParams();
+        this.searchPerformed.emit({ ...this.searchRequest });
+      });
+
+    // 5) Debounced “Skills” array changes (compare via JSON.stringify)
+    this.skillsSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged((prev, curr) => {
+          return JSON.stringify(prev) === JSON.stringify(curr);
+        })
+      )
+      .subscribe((skills: string[]) => {
+        this.searchRequest.skills = skills.length > 0 ? [...skills] : undefined;
+        this.searchRequest.page = 0;
+        this.updateUrlWithSearchParams();
+        this.searchPerformed.emit({ ...this.searchRequest });
+      });
   }
 
+  /**
+   * If the user refreshes/bookmarks a URL containing queryParams (e.g. ?title=Senior&location=NYC),
+   * read them here, populate `searchRequest`, and immediately emit so the parent loads filtered results.
+   */
   loadSearchFromUrl(): void {
     this.route.queryParams.subscribe(params => {
       if (Object.keys(params).length > 0) {
@@ -61,26 +126,31 @@ export class JobSearchComponent implements OnInit {
           location: params['location'] || undefined,
           jobType: params['jobType'] || undefined,
           experienceLevel: params['experience'] || undefined,
-          page: parseInt(params['page']) || 0,
-          size: parseInt(params['size']) || 10,
+          page: parseInt(params['page'], 10) || 0,
+          size: parseInt(params['size'], 10) || 10,
           sortBy: params['sortBy'] || 'createdAt',
           sortDirection: params['sortDirection'] || 'DESC'
         };
 
         if (params['skills']) {
-          this.selectedSkills = Array.isArray(params['skills']) 
-            ? params['skills'] 
+          this.selectedSkills = Array.isArray(params['skills'])
+            ? params['skills']
             : [params['skills']];
           this.searchRequest.skills = this.selectedSkills;
         }
 
-        // Show advanced search if advanced parameters are present
-        if (params['company'] || params['jobType'] || params['experience'] || params['skills']) {
+        // If any advanced field is preset, open the panel
+        if (
+          params['company'] ||
+          params['jobType'] ||
+          params['experience'] ||
+          params['skills']
+        ) {
           this.showAdvancedSearch = true;
         }
 
-        // Emit search to parent component
-        this.performSearch();
+        // Immediately emit to parent so that JobListComponent calls performSearch()
+        this.searchPerformed.emit({ ...this.searchRequest });
       }
     });
   }
@@ -89,17 +159,29 @@ export class JobSearchComponent implements OnInit {
     this.showAdvancedSearch = !this.showAdvancedSearch;
   }
 
+  /**
+   * Add a skill and then push the updated array into skillsSubject for debounced search
+   */
   addSkill(): void {
     if (this.skillInput.trim() && !this.selectedSkills.includes(this.skillInput.trim())) {
       this.selectedSkills.push(this.skillInput.trim());
       this.searchRequest.skills = [...this.selectedSkills];
       this.skillInput = '';
+
+      // Immediately push the new skills-array into the subject
+      this.skillsSubject.next([...this.selectedSkills]);
     }
   }
 
+  /**
+   * Remove a skill and then push the updated array into skillsSubject for debounced search
+   */
   removeSkill(skill: string): void {
     this.selectedSkills = this.selectedSkills.filter(s => s !== skill);
     this.searchRequest.skills = [...this.selectedSkills];
+
+    // Emit the new (possibly empty) skill list
+    this.skillsSubject.next([...this.selectedSkills]);
   }
 
   onSkillKeyPress(event: KeyboardEvent): void {
@@ -108,17 +190,20 @@ export class JobSearchComponent implements OnInit {
     }
   }
 
+  /**
+   * Manually trigger a search when the user clicks the “Search” button.
+   * (Optional fallback, since most fields now auto-search as you type/select.)
+   */
   performSearch(): void {
-    // Reset pagination when performing new search
     this.searchRequest.page = 0;
-    
-    // Update URL with search parameters
     this.updateUrlWithSearchParams();
-    
-    // Emit search request to parent component
     this.searchPerformed.emit({ ...this.searchRequest });
   }
 
+  /**
+   * “Clear All” resets every field to default, removes queryParams from URL,
+   * and emits an empty searchRequest so the parent can load all jobs again.
+   */
   clearSearch(): void {
     this.searchRequest = {
       page: 0,
@@ -128,21 +213,23 @@ export class JobSearchComponent implements OnInit {
     };
     this.selectedSkills = [];
     this.skillInput = '';
-    
-    // Clear URL parameters
+
+    // Remove queryParams entirely
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {}
     });
-    
-    // Emit empty search to show all jobs
+
+    // Emit an “empty” search so that JobListComponent can switch to loadAllJobs()
     this.searchPerformed.emit({ ...this.searchRequest });
   }
 
+  /**
+   * Whenever any field changes, re-compose the URL’s queryParams to reflect the current state.
+   */
   private updateUrlWithSearchParams(): void {
     const queryParams: any = {};
-    
-    // Only add non-empty parameters to URL
+
     if (this.searchRequest.jobTitle) {
       queryParams.title = this.searchRequest.jobTitle;
     }
@@ -172,5 +259,40 @@ export class JobSearchComponent implements OnInit {
       relativeTo: this.route,
       queryParams
     });
+  }
+
+  //
+  // ─── “ON CHANGE” HANDLERS FOR EACH FIELD ────────────────────────────────
+  //
+
+  /** Called on every keystroke in the “Job Title” field */
+  onTitleInput(value: string): void {
+    this.titleSubject.next(value.trim());
+  }
+
+  /** Called on every keystroke in the “Location” field */
+  onLocationInput(value: string): void {
+    this.locationSubject.next(value.trim());
+  }
+
+  /** Called on every keystroke in the “Company Name” field */
+  onCompanyInput(value: string): void {
+    this.companySubject.next(value.trim());
+  }
+
+  /** Called immediately when user changes the “Job Type” dropdown */
+  onJobTypeChange(value: string | null): void {
+    this.searchRequest.jobType = value || undefined;
+    this.searchRequest.page = 0;
+    this.updateUrlWithSearchParams();
+    this.searchPerformed.emit({ ...this.searchRequest });
+  }
+
+  /** Called immediately when user changes the “Experience Level” dropdown */
+  onExperienceChange(value: string | null): void {
+    this.searchRequest.experienceLevel = value || undefined;
+    this.searchRequest.page = 0;
+    this.updateUrlWithSearchParams();
+    this.searchPerformed.emit({ ...this.searchRequest });
   }
 }

@@ -1,0 +1,525 @@
+<!-- candidate-dashboard.component.html -->
+
+<div class="candidate-dashboard">
+  <div class="card">
+    <div class="dashboard-header">
+      <h2><i class="pi pi-user mr-2"></i>Candidate Dashboard</h2>
+      <p class="dashboard-subtitle">Manage your profile and track your job applications</p>
+    </div>
+    
+    <p-tabView styleClass="custom-tabview">
+      <!-- Dashboard Tab -->
+      <p-tabPanel header="Dashboard" leftIcon="pi pi-chart-line">
+        <div class="dashboard-content">
+          <p-skeleton height="200px" *ngIf="loadingDashboard"></p-skeleton>
+          
+          <div *ngIf="!loadingDashboard && dashboardStats">
+            <!-- Stats Cards -->
+            <div class="grid">
+              <div class="col-12 md:col-3">
+                <div class="stat-card total-applications">
+                  <div class="stat-icon">
+                    <i class="pi pi-briefcase"></i>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-number">{{dashboardStats.totalApplications}}</div>
+                    <div class="stat-label">Total Applications</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-3">
+                <div class="stat-card pending-applications">
+                  <div class="stat-icon">
+                    <i class="pi pi-clock"></i>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-number">{{getStatusCount('PENDING')}}</div>
+                    <div class="stat-label">Pending</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-3">
+                <div class="stat-card reviewed-applications">
+                  <div class="stat-icon">
+                    <i class="pi pi-eye"></i>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-number">{{getStatusCount('REVIEWED')}}</div>
+                    <div class="stat-label">Reviewed</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-3">
+                <div class="stat-card accepted-applications">
+                  <div class="stat-icon">
+                    <i class="pi pi-check-circle"></i>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-number">{{getStatusCount('ACCEPTED')}}</div>
+                    <div class="stat-label">Accepted</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recent Applications -->
+            <div class="recent-applications-section">
+              <h3><i class="pi pi-history mr-2"></i>Recent Applications</h3>
+              <p-table [value]="dashboardStats.recentApplications" 
+                       styleClass="p-datatable-sm custom-table"
+                       [paginator]="false">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Job Title</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Applied Date</th>
+                    <th>Last Updated</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-application>
+                  <tr>
+                    <td>
+                      <div class="job-title">{{application.jobTitle}}</div>
+                    </td>
+                    <td>
+                      <div class="company-name">{{application.companyName}}</div>
+                    </td>
+                    <td>
+                      <p-tag [value]="application.status" 
+                             [severity]="getStatusSeverity(application.status)"
+                             [icon]="getApplicationStatusIcon(application.status)">
+                      </p-tag>
+                    </td>
+                    <td>{{application.appliedDate | date:'MMM dd, yyyy'}}</td>
+                    <td>{{application.lastUpdated | date:'MMM dd, yyyy HH:mm'}}</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="5" class="text-center">
+                      <div class="empty-state">
+                        <i class="pi pi-inbox empty-icon"></i>
+                        <p>No recent applications found</p>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+      
+      <!-- Profile Tab -->
+      <p-tabPanel header="Profile" leftIcon="pi pi-user">
+        <div class="profile-content">
+          <p-skeleton height="400px" *ngIf="loadingProfile"></p-skeleton>
+          
+          <div *ngIf="!loadingProfile && candidateProfile">
+            <div class="profile-header">
+              <h3><i class="pi pi-id-card mr-2"></i>Profile Information</h3>
+              <div class="profile-actions">
+                <p-button label="Update Profile" 
+                          icon="pi pi-pencil" 
+                          (click)="openUpdateProfileDialog()"
+                          severity="secondary"
+                          size="small">
+                </p-button>
+                <p-button label="Upload Resume" 
+                          icon="pi pi-upload" 
+                          (click)="openResumeUploadDialog()"
+                          severity="info"
+                          size="small"
+                          class="ml-2">
+                </p-button>
+              </div>
+            </div>
+            
+            <div class="grid profile-grid">
+              <div class="col-12 md:col-6">
+                <div class="profile-field">
+                  <label class="field-label">First Name</label>
+                  <p class="field-value">{{candidateProfile.firstName}}</p>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-6">
+                <div class="profile-field">
+                  <label class="field-label">Last Name</label>
+                  <p class="field-value">{{candidateProfile.lastName || 'Not provided'}}</p>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-6">
+                <div class="profile-field">
+                  <label class="field-label">Email</label>
+                  <p class="field-value">
+                    <i class="pi pi-envelope mr-2"></i>
+                    {{candidateProfile.email}}
+                  </p>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-6">
+                <div class="profile-field">
+                  <label class="field-label">Phone</label>
+                  <p class="field-value">
+                    <i class="pi pi-phone mr-2" *ngIf="candidateProfile.phone"></i>
+                    {{candidateProfile.phone || 'Not provided'}}
+                  </p>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="profile-field">
+                  <label class="field-label">Headline</label>
+                  <p class="field-value">{{candidateProfile.headline || 'Not provided'}}</p>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="profile-field">
+                  <label class="field-label">Summary</label>
+                  <p class="field-value summary-text">{{candidateProfile.summary || 'Not provided'}}</p>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-6">
+                <div class="profile-field">
+                  <label class="field-label">Experience Years</label>
+                  <p class="field-value">
+                    <i class="pi pi-calendar mr-2" *ngIf="candidateProfile.experienceYears"></i>
+                    {{candidateProfile.experienceYears || 'Not specified'}} 
+                    <span *ngIf="candidateProfile.experienceYears">years</span>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="col-12 md:col-6">
+                <div class="profile-field">
+                  <label class="field-label">Resume</label>
+                  <div class="field-value" *ngIf="candidateProfile.resumeFileName">
+                    <div class="resume-info">
+                      <i class="pi pi-file-pdf mr-2 text-red-500"></i>
+                      <span>{{candidateProfile.resumeFileName}}</span>
+                    </div>
+                  </div>
+                  <p class="field-value no-data" *ngIf="!candidateProfile.resumeFileName">
+                    <i class="pi pi-file mr-2"></i>
+                    No resume uploaded
+                  </p>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="profile-field">
+                  <label class="field-label">Skills</label>
+                  <div class="field-value">
+                    <div class="skill-tags" *ngIf="candidateProfile.skills?.length; else noSkills">
+                      <p-tag *ngFor="let skill of candidateProfile.skills" 
+                             [value]="skill.name" 
+                             severity="info"
+                             styleClass="skill-tag">
+                      </p-tag>
+                    </div>
+                    <ng-template #noSkills>
+                      <p class="no-data">
+                        <i class="pi pi-tags mr-2"></i>
+                        No skills added
+                      </p>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+      
+      <!-- Applications Tab -->
+      <p-tabPanel header="My Applications" leftIcon="pi pi-list">
+        <div class="applications-content">
+          <div class="applications-header">
+            <h3><i class="pi pi-briefcase mr-2"></i>My Job Applications</h3>
+            <p class="applications-subtitle">Track the status of your job applications</p>
+          </div>
+          
+          <p-table [value]="jobApplications" 
+                   [paginator]="true" 
+                   [rows]="pageSize"
+                   [totalRecords]="totalApplications"
+                   [loading]="loadingApplications"
+                   (onPage)="onPageChange($event)"
+                   [lazy]="true"
+                   styleClass="p-datatable-sm custom-table"
+                   responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="createdAt">
+                  Applied Date 
+                  <p-sortIcon field="createdAt"></p-sortIcon>
+                </th>
+                <th>Job Details</th>
+                <th>Status</th>
+                <th>Resume</th>
+                <th>Cover Letter</th>
+                <th>Last Updated</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-application>
+              <tr>
+                <td>
+                  <div class="application-date">
+                    {{application.createdAt | date:'MMM dd, yyyy'}}
+                  </div>
+                </td>
+                 <td>
+                  <div class="job-details">
+                    <div class="job-id">Job Title: {{application.jobName}}</div>
+                  </div>
+                </td>
+                <td>
+                  <p-tag [value]="application.status" 
+                         [severity]="getStatusSeverity(application.status)"
+                         [icon]="getApplicationStatusIcon(application.status)">
+                  </p-tag>
+                </td>
+                <td>
+                  <div class="file-info" *ngIf="application.resumeFileName">
+                    <i class="pi pi-file-pdf mr-2 text-red-500"></i>
+                    <span class="file-name">{{application.resumeFileName}}</span>
+                  </div>
+                  <span class="no-file" *ngIf="!application.resumeFileName">
+                    <i class="pi pi-minus"></i>
+                  </span>
+                </td>
+                <td>
+                  <div class="file-info" *ngIf="application.coverLetterFileName">
+                    <i class="pi pi-file mr-2 text-blue-500"></i>
+                    <span class="file-name">{{application.coverLetterFileName}}</span>
+                  </div>
+                  <span class="no-file" *ngIf="!application.coverLetterFileName">
+                    <i class="pi pi-minus"></i>
+                  </span>
+                </td>
+                <td>
+                  <div class="last-updated">
+                    {{application.updatedAt | date:'MMM dd, yyyy HH:mm'}}
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6" class="text-center">
+                  <div class="empty-state">
+                    <i class="pi pi-inbox empty-icon"></i>
+                    <p>No job applications found</p>
+                    <small>Start applying to jobs to see them here</small>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+
+  <!-- Update Profile Dialog -->
+  <p-dialog header="Update Profile" 
+            [(visible)]="showUpdateProfileDialog" 
+            [modal]="true" 
+            [style]="{width: '50vw'}"
+            [maximizable]="true"
+            [draggable]="false"
+            [resizable]="false">
+    <form [formGroup]="profileUpdateForm" (ngSubmit)="updateProfile()">
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="firstName">First Name *</label>
+            <input type="text" 
+                   id="firstName"
+                   pInputText 
+                   formControlName="firstName"
+                   [class.ng-invalid]="isFieldInvalid('firstName')"
+                   placeholder="Enter your first name">
+            <small class="p-error" *ngIf="isFieldInvalid('firstName')">
+              {{getFieldError('firstName')}}
+            </small>
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="lastName">Last Name</label>
+            <input type="text" 
+                   id="lastName"
+                   pInputText 
+                   formControlName="lastName"
+                   placeholder="Enter your last name">
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input type="tel" 
+                   id="phone"
+                   pInputText 
+                   formControlName="phone"
+                   [class.ng-invalid]="isFieldInvalid('phone')"
+                   placeholder="Enter your phone number">
+            <small class="p-error" *ngIf="isFieldInvalid('phone')">
+              {{getFieldError('phone')}}
+            </small>
+          </div>
+        </div>
+        
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="experienceYears">Experience Years</label>
+            <p-inputNumber id="experienceYears"
+                          formControlName="experienceYears"
+                          [min]="0"
+                          [max]="50"
+                          placeholder="Years of experience">
+            </p-inputNumber>
+            <small class="p-error" *ngIf="isFieldInvalid('experienceYears')">
+              {{getFieldError('experienceYears')}}
+            </small>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <div class="field">
+            <label for="headline">Headline</label>
+            <input type="text" 
+                   id="headline"
+                   pInputText 
+                   formControlName="headline"
+                   [class.ng-invalid]="isFieldInvalid('headline')"
+                   placeholder="Professional headline">
+            <small class="p-error" *ngIf="isFieldInvalid('headline')">
+              {{getFieldError('headline')}}
+            </small>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <div class="field">
+            <label for="summary">Summary</label>
+            <textarea id="summary"
+                     pInputTextarea 
+                     formControlName="summary"
+                     [class.ng-invalid]="isFieldInvalid('summary')"
+                     rows="4"
+                     placeholder="Professional summary">
+            </textarea>
+            <small class="p-error" *ngIf="isFieldInvalid('summary')">
+              {{getFieldError('summary')}}
+            </small>
+          </div>
+        </div>
+        
+      <div class="col-12">
+  <div class="field">
+    <label for="skills">Skills</label>
+    <div class="skills-container">
+      <div class="skills-list">
+        <span 
+          *ngFor="let skill of skillsArray; let i = index" 
+          class="skill-tag"
+          (click)="removeSkillByIndex(i)">
+          {{skill}} <i class="pi pi-times"></i>
+        </span>
+      </div>
+      <input 
+        type="text" 
+        pInputText 
+        placeholder="Add skill and press Enter"
+        (keydown.enter)="addSkillFromInput($event)"
+        class="skill-input">
+    </div>
+  </div>
+</div>
+      </div>
+    </form>
+    
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button label="Cancel" 
+                  icon="pi pi-times" 
+                  (click)="cancelProfileUpdate()"
+                  severity="secondary"
+                  [text]="true">
+        </p-button>
+        <p-button label="Update" 
+                  icon="pi pi-check" 
+                  (click)="updateProfile()"
+                  [loading]="loading"
+                  [disabled]="profileUpdateForm.invalid">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Resume Upload Dialog -->
+  <p-dialog header="Upload Resume" 
+            [(visible)]="showResumeUploadDialog" 
+            [modal]="true" 
+            [style]="{width: '40vw'}"
+            [draggable]="false"
+            [resizable]="false">
+    <div class="upload-content">
+      <p class="upload-description">
+        Upload your resume in PDF, DOC, DOCX, or TXT format. Maximum file size is 5MB.
+      </p>
+      
+      <p-fileUpload #fileUpload
+                    name="file"
+                    mode="basic"
+                    [maxFileSize]="maxFileSize"
+                    [accept]="acceptedFileTypes"
+                    [auto]="false"
+                    chooseLabel="Choose Resume"
+                    chooseIcon="pi pi-upload"
+                    (onSelect)="onFileSelect($event)"
+                    [disabled]="loading">
+      </p-fileUpload>
+      
+      <div class="selected-file" *ngIf="uploadedFiles.length > 0">
+        <div class="file-preview">
+          <i class="pi pi-file-pdf mr-2"></i>
+          <span>{{uploadedFiles[0].name}}</span>
+          <span class="file-size">({{(uploadedFiles[0].size / 1024 / 1024).toFixed(2)}} MB)</span>
+        </div>
+      </div>
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button label="Cancel" 
+                  icon="pi pi-times" 
+                  (click)="cancelResumeUpload()"
+                  severity="secondary"
+                  [text]="true">
+        </p-button>
+        <p-button label="Upload" 
+                  icon="pi pi-upload" 
+                  (click)="uploadResume()"
+                  [loading]="loading"
+                  [disabled]="uploadedFiles.length === 0">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Toast Messages -->
+  <p-toast position="top-right"></p-toast>
+</div>

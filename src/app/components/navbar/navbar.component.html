@@ -5,6 +5,7 @@
     </div>
     <div class="navbar-menu">
       <a routerLink="/" class="navbar-item active">Home</a>
+      <a routerLink="/profile" class="navbar-item active" *ngIf="isAuthenticated">Profile</a>
       <!-- <a href="#" class="navbar-item">Companies</a>
       <a href="#" class="navbar-item">Resources</a> -->
     </div>
