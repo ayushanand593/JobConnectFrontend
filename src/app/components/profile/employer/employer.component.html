@@ -1,0 +1,393 @@
+<!-- employer-profile.component.html -->
+<div class="employer-profile-container">
+  <div class="page-header">
+    <h1>Employer Dashboard</h1>
+    <p>Manage your profile, jobs, and applications</p>
+  </div>
+
+  <p-tabView [(activeIndex)]="activeTab" (onChange)="onTabChange($event)">
+    
+    <!-- PROFILE TAB -->
+    <p-tabPanel header="Profile" leftIcon="pi pi-user">
+      <div class="profile-tab">
+        <div class="card">
+          <div class="card-header">
+            <h3>My Profile</h3>
+            <p-button 
+              *ngIf="!editing" 
+              icon="pi pi-pencil" 
+              label="Edit" 
+              class="p-button-outlined"
+              (onClick)="toggleEdit()">
+            </p-button>
+          </div>
+
+          <div class="profile-content" *ngIf="profile">
+            <!-- View Mode -->
+            <div *ngIf="!editing" class="profile-view">
+              <div class="profile-avatar">
+                <img 
+                  *ngIf="profile.profilePictureUrl; else defaultAvatar" 
+                  [src]="profile.profilePictureUrl" 
+                  alt="Profile Picture"
+                  class="avatar-img">
+                <ng-template #defaultAvatar>
+                  <div class="default-avatar">
+                    {{ profile.firstName.charAt(0) }}{{ profile.lastName.charAt(0) }}
+                  </div>
+                </ng-template>
+              </div>
+
+              <div class="profile-details">
+                <div class="detail-row">
+                  <label>Full Name:</label>
+                  <span>{{ profile.firstName }} {{ profile.lastName }}</span>
+                </div>
+                <div class="detail-row">
+                  <label>Email:</label>
+                  <span>{{ profile.email }}</span>
+                </div>
+                <div class="detail-row">
+                  <label>Phone:</label>
+                  <span>{{ profile.phone }}</span>
+                </div>
+                <div class="detail-row">
+                  <label>Job Title:</label>
+                  <span>{{ profile.jobTitle }}</span>
+                </div>
+                <div class="detail-row">
+                  <label>Company:</label>
+                  <span>{{ profile.companyName }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Mode -->
+            <form *ngIf="editing" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="firstName">First Name *</label>
+                  <input 
+                    pInputText 
+                    id="firstName" 
+                    formControlName="firstName" 
+                    placeholder="Enter first name">
+                </div>
+
+                <div class="form-field">
+                  <label for="lastName">Last Name *</label>
+                  <input 
+                    pInputText 
+                    id="lastName" 
+                    formControlName="lastName" 
+                    placeholder="Enter last name">
+                </div>
+
+                <div class="form-field">
+                  <label for="phone">Phone *</label>
+                  <input 
+                    pInputText 
+                    id="phone" 
+                    formControlName="phone" 
+                    placeholder="Enter phone number">
+                </div>
+
+                <div class="form-field">
+                  <label for="jobTitle">Job Title *</label>
+                  <input 
+                    pInputText 
+                    id="jobTitle" 
+                    formControlName="jobTitle" 
+                    placeholder="Enter job title">
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <p-button 
+                  type="button" 
+                  label="Cancel" 
+                  class="p-button-secondary"
+                  (onClick)="toggleEdit()">
+                </p-button>
+                <p-button 
+                  type="submit" 
+                  label="Save" 
+                  [loading]="profileLoading"
+                  [disabled]="!profileForm.valid">
+                </p-button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="profileLoading" class="loading-state">
+            <p-progressSpinner></p-progressSpinner>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- DASHBOARD TAB -->
+    <p-tabPanel header="Dashboard" leftIcon="pi pi-chart-bar">
+      <div class="dashboard-tab">
+        <div class="dashboard-controls">
+          <div class="date-range-control">
+            <label>Date Range:</label>
+            <p-calendar 
+              [(ngModel)]="dateRange" 
+              selectionMode="range" 
+              [readonlyInput]="false"
+              dateFormat="mm/dd/yy"
+              (onSelect)="onDateRangeChange()">
+            </p-calendar>
+          </div>
+        </div>
+
+        <div *ngIf="dashboardStats" class="dashboard-content">
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon jobs">
+                <i class="pi pi-briefcase"></i>
+              </div>
+              <div class="stat-content">
+                <h3>{{ dashboardStats.totalJobs }}</h3>
+                <p>Total Jobs</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon open">
+                <i class="pi pi-eye"></i>
+              </div>
+              <div class="stat-content">
+                <h3>{{ dashboardStats.openJobs }}</h3>
+                <p>Open Jobs</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon applications">
+                <i class="pi pi-users"></i>
+              </div>
+              <div class="stat-content">
+                <h3>{{ dashboardStats.totalApplications }}</h3>
+                <p>Total Applications</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon new">
+                <i class="pi pi-bell"></i>
+              </div>
+              <div class="stat-content">
+                <h3>{{ dashboardStats.newApplications }}</h3>
+                <p>New Applications</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Jobs -->
+          <div class="card">
+            <h4>Top Jobs by Applications</h4>
+            <div class="top-jobs">
+              <div *ngFor="let job of dashboardStats.topJobs" class="job-item">
+                <span class="job-title">{{ job.title }}</span>
+                <span class="job-count">{{ job.applicationCount }} applications</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="dashboardLoading" class="loading-state">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- JOBS TAB -->
+<p-tabPanel header="My Jobs" leftIcon="pi pi-briefcase">
+  <div class="jobs-tab">
+    <div class="jobs-header">
+      <h3>My Job Postings</h3>
+      <div class="jobs-controls">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input 
+            pInputText 
+            type="text" 
+            [(ngModel)]="jobSearchValue" 
+            placeholder="Search jobs..."
+            class="search-input">
+        </span>
+      </div>
+    </div>
+
+    <div class="jobs-list" *ngIf="!jobsLoading">
+      <div *ngFor="let job of jobs" class="job-card">
+        <div class="job-header">
+          <h4>{{ job.title }}</h4>
+          <p-tag 
+            [value]="job.status" 
+            [severity]="getStatusSeverity(job.status)">
+          </p-tag>
+        </div>
+        
+        <div class="job-content">
+          <p>{{ job.description | slice:0:150 }}...</p>
+          <div class="job-meta">
+            <span><i class="pi pi-calendar"></i> Created: {{ formatDate(job.createdAt) }}</span>
+          </div>
+        </div>
+
+        <div class="job-actions">
+          <p-button 
+            icon="pi pi-users" 
+            label="View Applications" 
+            class="p-button-outlined"
+            (onClick)="viewApplications(job.jobId)">
+          </p-button>
+          <p-button 
+            icon="pi pi-pencil" 
+            label="Edit" 
+            class="p-button-outlined"
+            (onClick)="editJob(job.jobId)">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="jobsLoading" class="loading-state">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  </div>
+</p-tabPanel>
+
+<!-- APPLICATIONS TAB -->
+<p-tabPanel header="Applications" leftIcon="pi pi-users">
+  <div class="applications-tab">
+    <div class="applications-header">
+      <h3>Job Applications</h3>
+      <div class="job-selector" *ngIf="jobs.length > 0">
+        <label>Select Job:</label>
+        <p-dropdown 
+          [options]="jobs" 
+          [(ngModel)]="selectedJobId"
+          optionLabel="title" 
+          optionValue="jobId"
+          [placeholder]="getSelectedJobTitle()"
+          (onChange)="loadApplications()">
+        </p-dropdown>
+      </div>
+    </div>
+
+    <div *ngIf="selectedJobId" class="applications-content">
+      <div class="applications-controls">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input 
+            pInputText 
+            type="text" 
+            [(ngModel)]="appSearchValue" 
+            (input)="onSearchChange()"
+            placeholder="Search by candidate name or email..."
+            class="search-input">
+        </span>
+
+        <p-dropdown 
+          [options]="statusOptions" 
+          [(ngModel)]="statusFilter"
+          optionLabel="label" 
+          optionValue="value"
+          placeholder="Filter by status"
+          (onChange)="onStatusFilterChange()">
+        </p-dropdown>
+      </div>
+
+      <div class="applications-list" *ngIf="!applicationsLoading">
+        <div *ngFor="let application of filteredApplications" class="application-card">
+          <div class="application-header">
+            <div class="candidate-info">
+              <h4>{{ application.candidateName || 'Unknown Candidate' }}</h4>
+              <p>{{ application.candidateEmail }}</p>
+            </div>
+            <p-tag 
+              [value]="application.status" 
+              [severity]="getStatusSeverity(application.status)">
+            </p-tag>
+          </div>
+
+          <div class="application-content">
+            <div class="application-meta">
+              <span><i class="pi pi-calendar"></i> Applied: {{ formatDateTime(application.createdAt) }}</span>
+              <span><i class="pi pi-clock"></i> Updated: {{ formatDateTime(application.updatedAt) }}</span>
+            </div>
+
+            <div class="file-downloads" *ngIf="application.resumeFileId || application.coverLetterFileId">
+              <p-button 
+                *ngIf="application.resumeFileId"
+                icon="pi pi-download" 
+                label="Resume" 
+                class="p-button-sm p-button-outlined"
+                (onClick)="downloadResume(application)">
+              </p-button>
+              <p-button 
+                *ngIf="application.coverLetterFileId"
+                icon="pi pi-download" 
+                label="Cover Letter" 
+                class="p-button-sm p-button-outlined"
+                (onClick)="downloadCoverLetter(application)">
+              </p-button>
+            </div>
+
+            <div class="disclosure-answers" *ngIf="application.disclosureAnswers?.length">
+              <h5>Disclosure Answers:</h5>
+              <div *ngFor="let answer of application.disclosureAnswers" class="disclosure-item">
+                <strong>{{ answer.questionText }}</strong>
+                <p>{{ answer.answerText }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="application-actions">
+            <p-button 
+              *ngIf="application.status === 'SUBMITTED'"
+              label="Review" 
+              class="p-button-sm"
+              (onClick)="updateApplicationStatus(application, ApplicationStatus.REVIEWED)">
+            </p-button>
+            <p-button 
+              *ngIf="application.status === 'REVIEWED' || application.status === 'SUBMITTED'"
+              label="Shortlist" 
+              class="p-button-sm p-button-success"
+              (onClick)="updateApplicationStatus(application, ApplicationStatus.SHORTLISTED)">
+            </p-button>
+            <p-button 
+              *ngIf="application.status !== 'REJECTED'"
+              label="Reject" 
+              class="p-button-sm p-button-danger"
+              (onClick)="updateApplicationStatus(application, ApplicationStatus.REJECTED)">
+            </p-button>
+          </div>
+        </div>
+
+        <div *ngIf="filteredApplications.length === 0" class="no-data">
+          <p>No applications found for the selected filters.</p>
+        </div>
+      </div>
+
+      <div *ngIf="applicationsLoading" class="loading-state">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </div>
+
+    <div *ngIf="!selectedJobId" class="no-job-selected">
+      <p>Please select a job to view its applications.</p>
+    </div>
+  </div>
+</p-tabPanel>
+
+  </p-tabView>
+</div>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>

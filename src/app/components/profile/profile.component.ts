@@ -16,7 +16,7 @@ import { AuthService } from 'src/app/services/auth-service.service';
   currentUser: User | null = null;
     emailForm: FormGroup;
     passwordForm: FormGroup;
-    
+     userRole: string | null = null;
     emailLoading = false;
     passwordLoading = false;
     showEmailDialog = false;
@@ -49,6 +49,7 @@ import { AuthService } from 'src/app/services/auth-service.service';
         .pipe(takeUntil(this.destroy$))
         .subscribe(user => {
           this.currentUser = user;
+          this.userRole = this.currentUser?.role ?? null;
           if (user) {
             this.emailForm.patchValue({
               newEmail: user.email

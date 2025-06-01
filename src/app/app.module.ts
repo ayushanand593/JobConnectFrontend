@@ -59,6 +59,9 @@ import { JobSearchComponent } from './components/home/job/job-search/job-search.
 import { CandidateComponent } from './components/profile/candidate/candidate.component';
 import { CandidateService } from './services/candidate-service.service';
 import { JobApplyComponent } from './components/home/job/job-apply/job-apply.component';
+import { EmployerComponent } from './components/profile/employer/employer.component';
+import { EmployerService } from './services/employer-service.service';
+import { CalendarModule } from 'primeng/calendar';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -107,10 +110,20 @@ const routes: Routes = [
       }
     ]
   },
-  {
-    path: '',
-    redirectTo: '/candidate/dashboard',
-    pathMatch: 'full'
+    {
+    path: 'employer',
+    children: [
+      {
+        path: 'dashboard',
+        component: EmployerComponent,
+        data: { title: 'Employer Dashboard' }
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
   },
   {
     path:'**',
@@ -134,6 +147,7 @@ const routes: Routes = [
     JobSearchComponent,
     CandidateComponent,
     JobApplyComponent,
+    EmployerComponent,
     
     
   ],
@@ -176,7 +190,8 @@ const routes: Routes = [
     TableModule,
     TabViewModule,
     DividerModule,
-    RadioButtonModule
+    RadioButtonModule,
+    CalendarModule
   ],
   providers: [ 
     AuthGuard,
@@ -185,6 +200,7 @@ const routes: Routes = [
     RegistrationService,
     JobService,
     CandidateService,
+    EmployerService,
     MessageService,
     ConfirmationService,
     {

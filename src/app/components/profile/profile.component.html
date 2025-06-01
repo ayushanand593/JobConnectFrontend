@@ -14,8 +14,8 @@
     </div>
   </div>
 
-<app-candidate></app-candidate>
-
+<app-candidate *ngIf="userRole === 'CANDIDATE'"></app-candidate>
+<app-employer *ngIf="userRole === 'EMPLOYER'"></app-employer>
 
   <div class="profile-content">
     <div class="profile-grid">
