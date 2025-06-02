@@ -7,6 +7,7 @@ import { EmployerDashboardStats } from 'src/app/interfaces/EmployerDashboardStat
 import { EmployerProfile } from 'src/app/interfaces/EmployerProfile';
 import { Job } from 'src/app/interfaces/Job';
 import { JobApplication } from 'src/app/interfaces/JobApplication';
+import { JobStatus } from 'src/app/interfaces/JobStatus';
 import { EmployerService } from 'src/app/services/employer-service.service';
 
 @Component({
@@ -50,6 +51,12 @@ export class EmployerComponent {
     { label: 'Shortlisted', value: ApplicationStatus.SHORTLISTED },
     { label: 'Rejected', value: ApplicationStatus.REJECTED }
   ];
+  // Add these properties to your component class
+jobStatusOptions = [
+  { label: 'Open', value: 'OPEN' },
+  { label: 'Closed', value: 'CLOSED' },
+  { label: 'Draft', value: 'DRAFT' }
+];
 
   constructor(
     private fb: FormBuilder,
@@ -342,7 +349,66 @@ ngOnInit() {
     });
     
   }
+  onStatusChange(jobId: string, newStatus: string, currentStatus: string): void {
+  // If status hasn't actually changed, do nothing
+  if (newStatus === currentStatus) {
+    return;
+  }
 
+  const statusLabel = this.getStatusLabel(newStatus);
+  
+  this.confirmationService.confirm({
+    message: `Are you sure you want to change the status of this job to ${statusLabel}?`,
+    header: 'Confirm Status Change',
+    icon: 'pi pi-exclamation-triangle',
+    accept: () => {
+      this.updateJobStatus(jobId, newStatus);
+    },
+    reject: () => {
+      // Reset dropdown to current status if user cancels
+      // This is handled by not updating the model
+    }
+  });
+}
+
+// Add this method to update job status
+updateJobStatus(jobId: string, newStatus: string): void {
+  this.employerService.updateJobStatus(jobId, newStatus as JobStatus).subscribe({
+    next: () => {
+      // Update the local jobs array
+      const jobIndex = this.jobs.findIndex(job => job.jobId === jobId);
+      if (jobIndex !== -1) {
+        this.jobs[jobIndex].status = newStatus as JobStatus;
+      }
+      
+      // Show success message
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Job status updated successfully'
+      });
+    },
+    error: (error) => {
+      console.error('Error updating job status:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update job status'
+      });
+    }
+  });
+}
+
+// Add this helper method to get status label
+getStatusLabel(status: string): string {
+  const option = this.statusOptions.find(opt => opt.value === status);
+  return option ? option.label : status;
+}
+
+// Add this method to check if dropdown should be disabled
+isStatusDropdownDisabled(status: string): boolean {
+  return status === 'CLOSED';
+}
   downloadResume(application: JobApplication) {
     if (application.resumeFileId) {
       this.employerService.downloadResume(application.resumeFileId).subscribe({

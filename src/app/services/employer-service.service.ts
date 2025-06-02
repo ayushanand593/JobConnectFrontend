@@ -7,6 +7,7 @@ import { EmployerProfile } from '../interfaces/EmployerProfile';
 import { EmployerProfileUpdate } from '../interfaces/EmployerProfileUpdate';
 import { Job } from '../interfaces/Job';
 import { JobApplication } from '../interfaces/JobApplication';
+import { JobStatus } from '../interfaces/JobStatus';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,11 @@ constructor(private http: HttpClient) {}
  updateApplicationStatus(applicationId: number, status: ApplicationStatus): Observable<void> {
   const params = new HttpParams().set('status', status);
   return this.http.patch<void>(`${this.baseUrl}/application/${applicationId}/status`, {}, { params });
+}
+
+updateJobStatus(jobId:string, status:JobStatus):Observable<void>{
+  const params = new HttpParams().set('status',status);
+   return this.http.patch<void>(`${this.baseUrl}/jobId/${jobId}/status`, {}, { params });
 }
 
   downloadResume(fileId: string): Observable<Blob> {

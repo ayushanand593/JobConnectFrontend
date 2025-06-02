@@ -242,6 +242,43 @@
       align-items: center;
       margin-bottom: 2rem;
 
+      .job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.job-status-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dropdown {
+  font-size: 0.875rem;
+}
+
+.status-dropdown .p-dropdown {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.status-dropdown .p-dropdown:hover {
+  border-color: #007bff;
+}
+
+.disabled-dropdown .p-dropdown {
+  background-color: #f5f5f5;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.disabled-dropdown .p-dropdown:hover {
+  border-color: #e0e0e0;
+}
+
       h3 {
         margin: 0;
         color: #2c3e50;
@@ -466,6 +503,16 @@
         max-width: 100%;
       }
     }
+  .job-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .job-status-section {
+    width: 100%;
+    justify-content: space-between;
+  }
 
     .job-actions,
     .application-actions {

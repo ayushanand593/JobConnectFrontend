@@ -204,8 +204,7 @@
       </div>
     </p-tabPanel>
 
-    <!-- JOBS TAB -->
-<p-tabPanel header="My Jobs" leftIcon="pi pi-briefcase">
+  <p-tabPanel header="My Jobs" leftIcon="pi pi-briefcase">
   <div class="jobs-tab">
     <div class="jobs-header">
       <h3>My Job Postings</h3>
@@ -226,10 +225,24 @@
       <div *ngFor="let job of jobs" class="job-card">
         <div class="job-header">
           <h4>{{ job.title }}</h4>
-          <p-tag 
-            [value]="job.status" 
-            [severity]="getStatusSeverity(job.status)">
-          </p-tag>
+          <div class="job-status-section">
+            <p-tag 
+              [value]="job.status" 
+              [severity]="getStatusSeverity(job.status)">
+            </p-tag>
+            <p-dropdown 
+              [options]="jobStatusOptions" 
+              [ngModel]="job.status"
+              (ngModelChange)="onStatusChange(job.jobId, $event, job.status)"
+              optionLabel="label" 
+              optionValue="value"
+              placeholder="Change Status"
+              [disabled]="isStatusDropdownDisabled(job.status)"
+              [style]="{'margin-left': '10px', 'min-width': '120px'}"
+              styleClass="status-dropdown"
+              [ngClass]="{'disabled-dropdown': isStatusDropdownDisabled(job.status)}">
+            </p-dropdown>
+          </div>
         </div>
         
         <div class="job-content">
