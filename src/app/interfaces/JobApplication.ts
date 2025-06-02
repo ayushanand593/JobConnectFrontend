@@ -9,6 +9,9 @@ export interface JobApplication {
   candidateId: number;
   candidateName?: string;
   candidateEmail?: string;
+  experienceYears:Number;
+  headline:string;
+  skills:Set<string>;
   resumeFileId?: string;
   resumeFileName?: string;
   coverLetterFileId?: string;

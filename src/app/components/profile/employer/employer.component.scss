@@ -345,10 +345,16 @@
   // ===== APPLICATIONS TAB STYLES =====
   .applications-tab {
     .applications-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
+     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+   &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
 
       h3 {
         margin: 0;
@@ -364,6 +370,9 @@
           font-weight: 600;
           color: #555;
         }
+        p-dropdown {
+        min-width: 200px;
+      }
       }
     }
 
@@ -377,6 +386,9 @@
         flex: 1;
         max-width: 400px;
       }
+        p-dropdown {
+      min-width: 180px;
+    }
     }
 
     .applications-list {
@@ -386,26 +398,126 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+       border: 1px solid #e0e0e0;
 
         .application-header {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           margin-bottom: 1rem;
+        
 
-          .candidate-info {
-            h4 {
-              margin: 0 0 0.25rem 0;
-              color: #2c3e50;
-              font-size: 1.2rem;
-            }
+           .candidate-info {
+          flex: 1;
 
-            p {
-              margin: 0;
-              color: #7f8c8d;
+          h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+          }
+
+          .candidate-email {
+            margin: 0 0 0.5rem 0;
+            color: #666;
+            font-size: 0.9rem;
+          }
+
+          .candidate-headline {
+            margin: 0;
+            color: #555;
+            font-style: italic;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+              color: #007bff;
+              font-size: 0.8rem;
             }
           }
         }
+
+        p-tag {
+          flex-shrink: 0;
+        
+          }
+        }
+
+         .candidate-details {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #007bff;
+
+        .detail-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: #555;
+            min-width: 100px;
+
+            i {
+              color: #007bff;
+              font-size: 0.9rem;
+            }
+          }
+
+          .detail-value {
+            color: #333;
+            font-weight: 500;
+          }
+        }
+
+        .skills-section {
+          .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 0.75rem;
+
+            i {
+              color: #007bff;
+              font-size: 0.9rem;
+            }
+          }
+
+          .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            .skill-tag {
+              font-size: 0.8rem;
+              
+              ::ng-deep .p-tag {
+                background: #e3f2fd;
+                color: #1976d2;
+                border: 1px solid #bbdefb;
+                padding: 0.25rem 0.5rem;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+      }
 
         .application-content {
           .application-meta {

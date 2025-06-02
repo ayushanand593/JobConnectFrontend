@@ -294,7 +294,7 @@ ngOnInit() {
       
       return matchesSearch && matchesStatus;
     });
-    console.log('Filtered applications:', this.filteredApplications);
+    // console.log('Filtered applications:', this.filteredApplications);
   }
 
   onSearchChange() {
@@ -344,7 +344,7 @@ ngOnInit() {
       },
       reject: () => {
       // This ensures the dialog closes properly on "No" click
-      console.log('Action cancelled');
+      // console.log('Action cancelled');
     }
     });
     
@@ -404,7 +404,46 @@ getStatusLabel(status: string): string {
   const option = this.statusOptions.find(opt => opt.value === status);
   return option ? option.label : status;
 }
+// Converts skills (Set, array, or comma-separated string) to a string array
+getSkillsArray(skills: Set<string> | string[] | string | undefined): string[] {
+  if (!skills) return [];
 
+  if (skills instanceof Set) {
+    return Array.from(skills);
+  }
+
+  if (Array.isArray(skills)) {
+    return skills;
+  }
+
+  if (typeof skills === 'string') {
+    return skills
+      .split(',')
+      .map(skill => skill.trim())
+      .filter(skill => skill.length > 0);
+  }
+
+  return [];
+}
+
+// Checks if the skills input is non-empty
+hasSkills(skills: Set<string> | string[] | string | undefined): boolean {
+  if (!skills) return false;
+
+  if (skills instanceof Set) {
+    return skills.size > 0;
+  }
+
+  if (Array.isArray(skills)) {
+    return skills.length > 0;
+  }
+
+  if (typeof skills === 'string') {
+    return skills.trim().length > 0;
+  }
+
+  return false;
+}
 // Add this method to check if dropdown should be disabled
 isStatusDropdownDisabled(status: string): boolean {
   return status === 'CLOSED';

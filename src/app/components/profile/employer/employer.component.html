@@ -321,12 +321,40 @@
           <div class="application-header">
             <div class="candidate-info">
               <h4>{{ application.candidateName || 'Unknown Candidate' }}</h4>
-              <p>{{ application.candidateEmail }}</p>
+              <p class="candidate-email">{{ application.candidateEmail }}</p>
+              <p class="candidate-headline" *ngIf="application.headline">
+                <i class="pi pi-user"></i>
+                {{ application.headline }}
+              </p>
             </div>
             <p-tag 
               [value]="application.status" 
               [severity]="getStatusSeverity(application.status)">
             </p-tag>
+          </div>
+
+          <!-- New Candidate Details Section -->
+          <div class="candidate-details">
+            <div class="detail-item" *ngIf="application.experienceYears">
+              <span class="detail-label">
+                <i class="pi pi-briefcase"></i>
+                Experience:
+              </span>
+              <span class="detail-value">{{ application.experienceYears }} years</span>
+            </div>
+            <div class="skills-section" *ngIf="hasSkills(application.skills)">
+              <span class="detail-label">
+                <i class="pi pi-cog"></i>
+                Skills:
+              </span>
+              <div class="skills-container">
+                <p-chip 
+                  *ngFor="let skill of getSkillsArray(application.skills)" 
+                  [label]="skill"
+                  class="skill-chip">
+                </p-chip>
+              </div>
+            </div>
           </div>
 
           <div class="application-content">
@@ -398,7 +426,6 @@
     </div>
   </div>
 </p-tabPanel>
-
   </p-tabView>
 </div>
 
