@@ -46,7 +46,7 @@ export class EmployerComponent {
   statusOptions = [
     { label: 'All Status', value: null },
     { label: 'Submitted', value: ApplicationStatus.SUBMITTED },
-    { label: 'Reviewed', value: ApplicationStatus.REVIEWED },
+    { label: 'Reviewed', value: ApplicationStatus.REVIEW },
     { label: 'Shortlisted', value: ApplicationStatus.SHORTLISTED },
     { label: 'Rejected', value: ApplicationStatus.REJECTED }
   ];
@@ -307,16 +307,24 @@ ngOnInit() {
         this.employerService.updateApplicationStatus(application.id, newStatus).subscribe({
           next: (updatedApplication) => {
             const index = this.applications.findIndex(app => app.id === application.id);
-            if (index !== -1) {
-              this.applications[index] = updatedApplication;
-              this.applyFilters();
-            }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Application status updated successfully'
-            });
-          },
+          if (index !== -1) {
+            // Update the status locally
+            this.applications[index] = {
+              ...this.applications[index],
+              status: newStatus,
+              updatedAt: new Date() // Update timestamp
+            };
+            this.applyFilters();
+           // Reapply filters to update the view
+          }
+          
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Application status updated successfully'
+          });
+          
+        },
           error: (error) => {
             console.error('Error updating application status:', error);
             this.messageService.add({
@@ -326,8 +334,13 @@ ngOnInit() {
             });
           }
         });
-      }
+      },
+      reject: () => {
+      // This ensures the dialog closes properly on "No" click
+      console.log('Action cancelled');
+    }
     });
+    
   }
 
   downloadResume(application: JobApplication) {

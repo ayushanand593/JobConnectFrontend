@@ -7,6 +7,7 @@ export interface JobApplicationDTO {
   jobName:string;
   companyName:string;
   candidateId: number;
+  candidateName: string; 
   resumeFileId: string;
   resumeFileName: string;
   coverLetterFileId: string;

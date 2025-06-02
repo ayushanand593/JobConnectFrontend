@@ -353,10 +353,10 @@
               *ngIf="application.status === 'SUBMITTED'"
               label="Review" 
               class="p-button-sm"
-              (onClick)="updateApplicationStatus(application, ApplicationStatus.REVIEWED)">
+              (onClick)="updateApplicationStatus(application, ApplicationStatus.REVIEW)">
             </p-button>
             <p-button 
-              *ngIf="application.status === 'REVIEWED' || application.status === 'SUBMITTED'"
+              *ngIf="application.status === 'REVIEW' || application.status === 'SUBMITTED'"
               label="Shortlist" 
               class="p-button-sm p-button-success"
               (onClick)="updateApplicationStatus(application, ApplicationStatus.SHORTLISTED)">
@@ -390,4 +390,4 @@
 </div>
 
 <!-- Confirmation Dialog -->
-<p-confirmDialog></p-confirmDialog>
+<!-- <p-confirmDialog></p-confirmDialog> -->

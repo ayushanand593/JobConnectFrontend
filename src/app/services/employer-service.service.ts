@@ -44,9 +44,10 @@ constructor(private http: HttpClient) {}
     return this.http.get<JobApplication[]>(`${this.baseUrl}/applications/${jobId}`);
   }
 
-  updateApplicationStatus(applicationId: number, status: ApplicationStatus): Observable<JobApplication> {
-    return this.http.patch<JobApplication>(`${this.baseUrl}/application/${applicationId}/status`, { status });
-  }
+ updateApplicationStatus(applicationId: number, status: ApplicationStatus): Observable<void> {
+  const params = new HttpParams().set('status', status);
+  return this.http.patch<void>(`${this.baseUrl}/application/${applicationId}/status`, {}, { params });
+}
 
   downloadResume(fileId: string): Observable<Blob> {
     return this.http.get(`http://localhost:8080/api/files/${fileId}`, { responseType: 'blob' });
