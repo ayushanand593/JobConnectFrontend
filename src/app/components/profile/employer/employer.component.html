@@ -426,6 +426,286 @@
     </div>
   </div>
 </p-tabPanel>
+    <!-- Create Job Tab -->
+    <p-tabPanel header="Create Job" leftIcon="pi pi-plus">
+      <div class="tab-content">
+        <div class="create-job-header">
+          <h3>Create New Job Posting</h3>
+          <p>Fill in the details below to create a new job posting</p>
+        </div>
+
+        <form [formGroup]="jobForm" (ngSubmit)="onSubmitJob()" class="job-form">
+          
+          <!-- Basic Information Section -->
+          <div class="form-section">
+            <h4 class="section-title">Basic Information</h4>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="title" class="form-label required">Job Title</label>
+                <input 
+                  id="title"
+                  type="text" 
+                  pInputText 
+                  formControlName="title"
+                  placeholder="e.g. Senior Software Engineer"
+                  [class.ng-invalid]="isFieldInvalid('title')"
+                  class="form-input">
+                <small class="error-message" *ngIf="isFieldInvalid('title')">
+                  {{ getFieldError('title') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="location" class="form-label required">Location</label>
+                <input 
+                  id="location"
+                  type="text" 
+                  pInputText 
+                  formControlName="location"
+                  placeholder="e.g. New York, NY or Remote"
+                  [class.ng-invalid]="isFieldInvalid('location')"
+                  class="form-input">
+                <small class="error-message" *ngIf="isFieldInvalid('location')">
+                  {{ getFieldError('location') }}
+                </small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="jobType" class="form-label required">Job Type</label>
+                <p-dropdown 
+                  id="jobType"
+                  formControlName="jobType"
+                  [options]="jobTypes"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select job type"
+                  [class.ng-invalid]="isFieldInvalid('jobType')"
+                  styleClass="form-dropdown">
+                </p-dropdown>
+                <small class="error-message" *ngIf="isFieldInvalid('jobType')">
+                  {{ getFieldError('jobType') }}
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="experienceLevel" class="form-label">Experience Level</label>
+                <p-dropdown 
+                  id="experienceLevel"
+                  formControlName="experienceLevel"
+                  [options]="experienceLevels"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select experience level"
+                  styleClass="form-dropdown">
+                </p-dropdown>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="salaryRange" class="form-label">Salary Range</label>
+                <input 
+                  id="salaryRange"
+                  type="text" 
+                  pInputText 
+                  formControlName="salaryRange"
+                  placeholder="e.g. $80,000 - $120,000 per year"
+                  class="form-input">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="applicationDeadline" class="form-label">Application Deadline</label>
+                <p-calendar 
+                  id="applicationDeadline"
+                  formControlName="applicationDeadline"
+                  [minDate]="minDate"
+                  dateFormat="mm/dd/yy"
+                  placeholder="Select deadline date"
+                  styleClass="form-calendar">
+                </p-calendar>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills Section -->
+          <div class="form-section">
+            <h4 class="section-title">Required Skills</h4>
+            
+            <div class="form-group">
+             <div class="selected-skills" *ngIf="selectedSkills.length > 0">
+    <span 
+      *ngFor="let skill of selectedSkills" 
+      class="skill-chip">
+      {{ skill }}
+      <button 
+        type="button" 
+        class="remove-skill" 
+        (click)="removeSkill(skill)"
+        aria-label="Remove skill">
+        ×
+      </button>
+    </span>
+  </div>
+  
+  <!-- AutoComplete Input -->
+  <p-autoComplete
+    id="skills"
+    [formControl]="skillInputControl"
+    [suggestions]="filteredSkills"
+    (completeMethod)="filterSkills($event)"
+    (onSelect)="onSkillSelect($event)"
+    placeholder="Type to search and add skills"
+    (keyup.enter)="handleEnterKey($event)"
+    [forceSelection]="false"
+    [multiple]="false"
+    styleClass="form-autocomplete">
+  </p-autoComplete>
+  
+  <!-- Hidden form control to maintain form binding -->
+  <input 
+    type="hidden" 
+    formControlName="skills" 
+    [value]="selectedSkills">
+            </div>
+          </div>
+
+          <!-- Description Section -->
+          <div class="form-section">
+            <h4 class="section-title">Job Details</h4>
+            
+            <div class="form-group">
+              <label for="description" class="form-label required">Job Description</label>
+              <textarea 
+                id="description"
+                pInputTextarea 
+                formControlName="description"
+                placeholder="Provide a detailed description of the job role, responsibilities, and what you're looking for in a candidate..."
+                rows="6"
+                [class.ng-invalid]="isFieldInvalid('description')"
+                class="form-textarea">
+              </textarea>
+              <small class="error-message" *ngIf="isFieldInvalid('description')">
+                {{ getFieldError('description') }}
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="requirements" class="form-label">Requirements</label>
+              <textarea 
+                id="requirements"
+                pInputTextarea 
+                formControlName="requirements"
+                placeholder="List the required qualifications, skills, experience, and education..."
+                rows="4"
+                class="form-textarea">
+              </textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="responsibilities" class="form-label">Key Responsibilities</label>
+              <textarea 
+                id="responsibilities"
+                pInputTextarea 
+                formControlName="responsibilities"
+                placeholder="Describe the main responsibilities and duties for this position..."
+                rows="4"
+                class="form-textarea">
+              </textarea>
+            </div>
+          </div>
+
+          <!-- Disclosure Questions Section -->
+          <div class="form-section">
+            <h4 class="section-title">
+              Disclosure Questions
+              <span class="section-subtitle">(Optional)</span>
+            </h4>
+            <p class="section-description">
+              Add custom questions for candidates to answer during the application process.
+            </p>
+            
+            <div formArrayName="disclosureQuestions">
+              <div 
+                *ngFor="let question of disclosureQuestionsFormArray.controls; let i = index"
+                [formGroupName]="i"
+                class="disclosure-question-item">
+                
+                <div class="question-header">
+                  <h5>Question {{ i + 1 }}</h5>
+                  <button 
+                    type="button"
+                    class="remove-question-btn"
+                    (click)="removeDisclosureQuestion(i)"
+                    [disabled]="disclosureQuestionsFormArray.length === 0">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+
+                <div class="form-group">
+                  <label [for]="'questionText_' + i" class="form-label required">Question Text</label>
+                  <textarea 
+                    [id]="'questionText_' + i"
+                    pInputTextarea 
+                    formControlName="questionText"
+                    placeholder="Enter your question for candidates..."
+                    rows="3"
+                    [class.ng-invalid]="isDisclosureQuestionInvalid(i, 'questionText')"
+                    class="form-textarea">
+                  </textarea>
+                  <small 
+                    class="error-message" 
+                    *ngIf="isDisclosureQuestionInvalid(i, 'questionText')">
+                    Question text is required and must be at least 10 characters
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <p-checkbox 
+                    [inputId]="'isRequired_' + i"
+                    formControlName="isRequired" 
+                    [binary]="true"
+                    label="Required question">
+                  </p-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              type="button" 
+              class="add-question-btn"
+              (click)="addDisclosureQuestion()">
+              <i class="pi pi-plus"></i>
+              Add Question
+            </button>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="resetJobForm()"
+              [disabled]="isCreatingJob">
+              Reset Form
+            </button>
+            
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="!jobForm.valid || isCreatingJob">
+              <i class="pi pi-spin pi-spinner" *ngIf="isCreatingJob"></i>
+              <i class="pi pi-check" *ngIf="!isCreatingJob"></i>
+              {{ isCreatingJob ? 'Creating Job...' : 'Create Job' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </p-tabPanel>
   </p-tabView>
 </div>
 

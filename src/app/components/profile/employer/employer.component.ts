@@ -1,14 +1,19 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ApplicationStatus } from 'src/app/interfaces/ApplicationStatus';
 import { EmployerDashboardStats } from 'src/app/interfaces/EmployerDashboardStats';
 import { EmployerProfile } from 'src/app/interfaces/EmployerProfile';
 import { Job } from 'src/app/interfaces/Job';
+import { JobType } from 'src/app/interfaces/JobType';
+import { ExperienceLevel } from 'src/app/interfaces/ExperienceLevel';
 import { JobApplication } from 'src/app/interfaces/JobApplication';
 import { JobStatus } from 'src/app/interfaces/JobStatus';
 import { EmployerService } from 'src/app/services/employer-service.service';
+import { DisclosureQuestion } from 'src/app/interfaces/DisclosureQuestion';
+import { JobService } from 'src/app/services/job.service';
+import { JobCreateDTO } from 'src/app/interfaces/JobCreateDTO';
 
 @Component({
   selector: 'app-employer',
@@ -44,6 +49,23 @@ export class EmployerComponent {
   appSearchValue = '';
   statusFilter: ApplicationStatus | null = null;
 
+  // Create Job functionality
+jobForm: FormGroup;
+  jobTypes: any[] = JobType;
+  experienceLevels: any[] =ExperienceLevel;
+  availableSkills: string[] = [];
+  isCreatingJob:boolean=false;
+// filteredSkills: string[] = [];
+selectedSkills: string[] = [];
+skillInput: string = '';
+skillInputControl = new FormControl('');
+filteredSkills: string[] = [];
+isLoadingSkills: boolean = false;
+minDate: Date = new Date();
+
+   // Disclosure Questions
+  disclosureQuestions: DisclosureQuestion[] = [];
+
   statusOptions = [
     { label: 'All Status', value: null },
     { label: 'Submitted', value: ApplicationStatus.SUBMITTED },
@@ -62,6 +84,7 @@ jobStatusOptions = [
     private fb: FormBuilder,
     private employerService: EmployerService,
     private messageService: MessageService,
+    private jobService:JobService,
     private confirmationService: ConfirmationService,
     private router: Router,
     private route: ActivatedRoute
@@ -73,11 +96,26 @@ jobStatusOptions = [
       jobTitle: ['', Validators.required]
     });
 
+    this.jobForm = this.fb.group({
+    title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+    location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+    jobType: ['', Validators.required],
+    experienceLevel: [''],
+    description: ['', [Validators.required, Validators.minLength(50), Validators.maxLength(5000)]],
+    requirements: ['', [Validators.maxLength(3000)]],
+    responsibilities: ['', [Validators.maxLength(3000)]],
+    salaryRange: ['', [Validators.maxLength(50)]],
+    skills: [[]],
+    applicationDeadline: [''],
+    disclosureQuestions: this.fb.array([])
+  });
+
     // Default date range to last 30 days
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
     this.dateRange = [startDate, endDate];
+     this.initializeJobForm();
   }
 
 ngOnInit() {
@@ -95,10 +133,23 @@ ngOnInit() {
       this.loadApplications();
     }
   });
+ if (!this.jobForm.get('skills')?.value) {
+    this.jobForm.patchValue({ skills: [] });
+  }
+  
+  // Sync selectedSkills with form control value on init and format them
+  const existingSkills = this.jobForm.get('skills')?.value || [];
+  this.selectedSkills = existingSkills.map((skill: string) => this.formatSkill(skill));
+  
+  // Update form control with formatted skills
+  if (existingSkills.length > 0) {
+    this.updateFormControl();
+  }
 
   this.loadProfile();
   this.loadDashboardStats();
   this.loadJobs();
+    this.loadInitialData();
 }
 
   onTabChange(event: any) {
@@ -494,6 +545,254 @@ isStatusDropdownDisabled(status: string): boolean {
     }
   }
 
+  // ===== CREATE JOB METHODS =====
+
+   private initializeJobForm(): void {
+    this.jobForm = this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      jobType: ['', Validators.required],
+      experienceLevel: [''],
+      description: ['', [Validators.required, Validators.minLength(50), Validators.maxLength(5000)]],
+      requirements: ['', [Validators.maxLength(3000)]],
+      responsibilities: ['', [Validators.maxLength(3000)]],
+      salaryRange: ['', [Validators.maxLength(50)]],
+      skills: [[]],
+      applicationDeadline: [''],
+      disclosureQuestions: this.fb.array([])
+    });
+  }
+
+  private loadInitialData(): void {
+    // Load job types and experience levels
+    this.jobTypes = this.jobTypes;
+    this.experienceLevels = this.experienceLevels;
+    
+    // Load available skills
+    this.isLoadingSkills = true;
+    this.jobService.getAvailableSkills().subscribe({
+      next: (skills) => {
+        this.availableSkills = skills;
+        this.isLoadingSkills = false;
+      },
+      error: (error) => {
+        console.error('Error loading skills:', error);
+        this.isLoadingSkills = false;
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: 'Could not load available skills'
+        });
+      }
+    });
+  }
+
+  // Disclosure Questions FormArray methods
+  get disclosureQuestionsFormArray(): FormArray {
+    return this.jobForm.get('disclosureQuestions') as FormArray;
+  }
+
+  addDisclosureQuestion(): void {
+    const questionForm = this.fb.group({
+      questionText: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+      isRequired: [true]
+    });
+    
+    this.disclosureQuestionsFormArray.push(questionForm);
+  }
+
+  removeDisclosureQuestion(index: number): void {
+    if (this.disclosureQuestionsFormArray.length > 0) {
+      this.disclosureQuestionsFormArray.removeAt(index);
+    }
+  }
+
+  // Skills management
+onSkillSelect(event: any): void {
+  const pickedSkill = typeof event === 'string' ? event : event.value || event;
+  
+  if (pickedSkill && typeof pickedSkill === 'string') {
+    const formattedSkill = this.formatSkill(pickedSkill);
+    
+    // Check for duplicates case-insensitively
+    if (!this.selectedSkills.some(s => s.toLowerCase() === formattedSkill.toLowerCase())) {
+      this.selectedSkills = [...this.selectedSkills, formattedSkill];
+      this.updateFormControl();
+    }
+  }
+  
+  // Clear input after selection
+  this.clearSkillInput();
+}
+
+removeSkill(skill: string): void {
+  // Filter out the skill to be removed (using case-insensitive comparison)
+  this.selectedSkills = this.selectedSkills.filter(s => s.toLowerCase() !== skill.toLowerCase());
+  this.updateFormControl();
+}
+
+filterSkills(event: any): void {
+  this.isLoadingSkills = true;
+  const query = (event.query || '').toLowerCase().trim();
+  
+  // Simulate async filtering
+  setTimeout(() => {
+    if (query) {
+      this.filteredSkills = this.availableSkills.filter(skill =>
+        skill.toLowerCase().includes(query) &&
+        !this.selectedSkills.some(s => s.toLowerCase() === skill.toLowerCase())
+      );
+    } else {
+      this.filteredSkills = [];
+    }
+    this.isLoadingSkills = false;
+  }, 200);
+}
+
+handleEnterKey(event: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+  this.addCustomSkill();
+}
+
+addCustomSkill(): void {
+  // Get the current input value from FormControl
+  const customSkill = (this.skillInputControl.value || '').trim();
+  if (customSkill) {
+    const formattedSkill = this.formatSkill(customSkill);
+    
+    // Check for duplicates case-insensitively
+    if (!this.selectedSkills.some(s => s.toLowerCase() === formattedSkill.toLowerCase())) {
+      this.selectedSkills = [...this.selectedSkills, formattedSkill];
+      this.updateFormControl();
+    }
+  }
+  
+  this.clearSkillInput();
+}
+
+onSkillInput(event: any): void {
+  this.skillInput = event.target.value || '';
+  // Also update the FormControl value
+  this.skillInputControl.setValue(this.skillInput, { emitEvent: false });
+}
+
+// Helper methods
+private formatSkill(skill: string): string {
+  return skill.trim()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+private updateFormControl(): void {
+  this.jobForm.patchValue({ skills: [...this.selectedSkills] });
+}
+
+private clearSkillInput(): void {
+  this.skillInput = '';
+  this.skillInputControl.setValue('', { emitEvent: false });
+}
+
+
+  // Form submission
+  onSubmitJob(): void {
+    if (this.jobForm.valid) {
+      this.isCreatingJob = true;
+      
+      const formValue = this.jobForm.value;
+      
+      // Prepare disclosure questions
+      const disclosureQuestions: DisclosureQuestion[] = formValue.disclosureQuestions?.map((q: any) => ({
+        id: 0, // Will be generated by backend
+        questionText: q.questionText,
+        questionType: 'TEXT' as const, // Default to TEXT type
+        isRequired: q.isRequired,
+        options: [] // Empty for TEXT type
+      })) || [];
+
+      const jobCreateDTO: JobCreateDTO = {
+        title: formValue.title,
+        location: formValue.location,
+        jobType: formValue.jobType,
+        experienceLevel: formValue.experienceLevel || undefined,
+        description: formValue.description,
+        requirements: formValue.requirements || undefined,
+        responsibilities: formValue.responsibilities || undefined,
+        salaryRange: formValue.salaryRange || undefined,
+        skills: this.selectedSkills.length > 0 ? this.selectedSkills : undefined,
+        applicationDeadline: formValue.applicationDeadline ? 
+          new Date(formValue.applicationDeadline).toISOString().split('T')[0] : undefined,
+        disclosureQuestions: disclosureQuestions.length > 0 ? disclosureQuestions : undefined
+      };
+
+      this.jobService.createJob(jobCreateDTO).subscribe({
+        next: (createdJob) => {
+          this.isCreatingJob = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Job created successfully!'
+          });
+          this.resetJobForm();
+          // Optionally switch to a different tab or refresh job list
+          this.activeTab = 2; // Switch to "My Jobs" tab
+        },
+        error: (error) => {
+          this.isCreatingJob = false;
+          console.error('Error creating job:', error);
+          
+          let errorMessage = 'Failed to create job. Please try again.';
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.error?.errors) {
+            // Handle validation errors
+            const validationErrors = Object.values(error.error.errors).join(', ');
+            errorMessage = `Validation errors: ${validationErrors}`;
+          }
+          
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: errorMessage
+          });
+        }
+      });
+    } else {
+      // Mark all fields as touched to show validation errors
+      this.markFormGroupTouched(this.jobForm);
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Form Invalid',
+        detail: 'Please fill in all required fields correctly.'
+      });
+    }
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      } else if (control instanceof FormArray) {
+        control.controls.forEach(arrayControl => {
+          if (arrayControl instanceof FormGroup) {
+            this.markFormGroupTouched(arrayControl);
+          }
+        });
+      }
+    });
+  }
+
+  public resetJobForm(): void {
+    this.jobForm.reset();
+    this.selectedSkills = [];
+    this.disclosureQuestionsFormArray.clear();
+    this.initializeJobForm();
+  }
+
   // ===== UTILITY METHODS =====
   getStatusSeverity(status: string): string {
     switch (status) {
@@ -529,4 +828,44 @@ isStatusDropdownDisabled(status: string): boolean {
     const job = this.jobs.find(j => String(j.jobId) === String(this.selectedJobId));
     return job ? job.title : 'Select a Job';
   }
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.jobForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.jobForm.get(fieldName);
+    if (field && field.errors && (field.dirty || field.touched)) {
+      if (field.errors['required']) {
+        return `${this.getFieldLabel(fieldName)} is required`;
+      }
+      if (field.errors['minlength']) {
+        return `${this.getFieldLabel(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
+      }
+      if (field.errors['maxlength']) {
+        return `${this.getFieldLabel(fieldName)} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
+      }
+    }
+    return '';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      title: 'Job Title',
+      location: 'Location',
+      jobType: 'Job Type',
+      description: 'Description',
+      requirements: 'Requirements',
+      responsibilities: 'Responsibilities',
+      salaryRange: 'Salary Range'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  isDisclosureQuestionInvalid(index: number, fieldName: string): boolean {
+    const questionForm = this.disclosureQuestionsFormArray.at(index) as FormGroup;
+    const field = questionForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
 }

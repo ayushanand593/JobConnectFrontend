@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { PageResponse } from '../interfaces/PageResponse';
 import { Job } from '../interfaces/Job';
 import { JobSearchRequest } from '../interfaces/JobSearchRequest';
@@ -8,6 +8,7 @@ import { DisclosureQuestion } from '../interfaces/DisclosureQuestion';
 import { JobDisclosureQuestionsDTO } from '../interfaces/JobDisclosureQuestionsDTO';
 import { JobApplicationSubmissionDTO } from '../interfaces/JobApplicationSubmissionDTO';
 import { JobApplicationDTO } from '../interfaces/JobApplicationDTO';
+import { JobCreateDTO } from '../interfaces/JobCreateDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +46,10 @@ private apiUrl = 'http://localhost:8080/api/jobs'; // Adjust base URL as needed
     return this.http.get<JobDisclosureQuestionsDTO>(`${this.apiUrl}/${jobId}/disclosure-questions`);
   }
 
+ createJob(jobData: JobCreateDTO): Observable<Job> {
+    return this.http.post<Job>(`${this.apiUrl}/create-job`, jobData);
+  }
+
   applyToJob(
     jobId: string, 
     applicationData: JobApplicationSubmissionDTO,
@@ -69,37 +74,17 @@ private apiUrl = 'http://localhost:8080/api/jobs'; // Adjust base URL as needed
     
     return this.http.post<JobApplicationDTO>(`${this.apiUrl}/apply/${jobId}`, formData);
   }
-
-  // Search jobs using GET method (for simple search with query parameters)
-  // searchJobsGet(searchRequest: JobSearchRequest): Observable<PageResponse<Job>> {
-  //   let params = new HttpParams();
-    
-  //   if (searchRequest.companyName) {
-  //     params = params.set('companyName', searchRequest.companyName);
-  //   }
-  //   if (searchRequest.jobTitle) {
-  //     params = params.set('jobTitle', searchRequest.jobTitle);
-  //   }
-  //   if (searchRequest.location) {
-  //     params = params.set('location', searchRequest.location);
-  //   }
-  //   if (searchRequest.skills && searchRequest.skills.length > 0) {
-  //     searchRequest.skills.forEach(skill => {
-  //       params = params.append('skills', skill);
-  //     });
-  //   }
-  //   if (searchRequest.experienceLevel) {
-  //     params = params.set('experienceLevel', searchRequest.experienceLevel);
-  //   }
-  //   if (searchRequest.jobType) {
-  //     params = params.set('jobType', searchRequest.jobType);
-  //   }
-    
-  //   params = params.set('page', (searchRequest.page || 0).toString());
-  //   params = params.set('size', (searchRequest.size || 10).toString());
-  //   params = params.set('sortBy', searchRequest.sortBy || 'createdAt');
-  //   params = params.set('sortDirection', searchRequest.sortDirection || 'DESC');
-
-  //   return this.http.get<PageResponse<Job>>(`${this.apiUrl}/search`, { params });
-  // }
+getAvailableSkills(): Observable<string[]> {
+    // For now returning static list, but you can modify to fetch from backend
+    return of([
+      'JavaScript', 'TypeScript', 'Angular', 'React', 'Vue.js', 'Node.js',
+      'Python', 'Java', 'C#', 'PHP', 'Ruby', 'Go', 'Rust', 'Swift',
+      'HTML', 'CSS', 'SASS', 'LESS', 'Bootstrap', 'Tailwind CSS',
+      'SQL', 'MongoDB', 'PostgreSQL', 'MySQL', 'Redis', 'ElasticSearch',
+      'AWS', 'Azure', 'Google Cloud', 'Docker', 'Kubernetes', 'Jenkins',
+      'Git', 'Agile', 'Scrum', 'Project Management', 'Communication',
+      'Problem Solving', 'Team Leadership', 'Mentoring'
+    ]);
+  }
+ 
 }
