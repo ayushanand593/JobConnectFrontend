@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -55,6 +56,7 @@ jobForm: FormGroup;
   experienceLevels: any[] =ExperienceLevel;
   availableSkills: string[] = [];
   isCreatingJob:boolean=false;
+
 // filteredSkills: string[] = [];
 selectedSkills: string[] = [];
 skillInput: string = '';
@@ -65,6 +67,13 @@ minDate: Date = new Date();
 
    // Disclosure Questions
   disclosureQuestions: DisclosureQuestion[] = [];
+
+  // dialog to show the resume and coverletter
+  displayFileDialog = false;
+dialogTitle = '';
+dialogFileUrl: SafeResourceUrl | null = null;
+fileType: 'pdf' | 'text' | 'word' | 'unsupported' = 'pdf';
+fileContent: string = '';
 
   statusOptions = [
     { label: 'All Status', value: null },
@@ -87,7 +96,8 @@ jobStatusOptions = [
     private jobService:JobService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+     private sanitizer: DomSanitizer
   ) {
     this.profileForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -267,7 +277,9 @@ ngOnInit() {
     this.jobsLoading = true;
     this.employerService.getMyJobs().subscribe({
       next: (jobs) => {
-        this.jobs = jobs;
+        this.jobs = jobs.sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
         this.jobsLoading = false;
       },
       error: (error) => {
@@ -544,6 +556,123 @@ isStatusDropdownDisabled(status: string): boolean {
       });
     }
   }
+viewResume(application: JobApplication) {
+  if (application.resumeFileId) {
+    this.employerService.downloadResume(application.resumeFileId).subscribe({
+      next: (blob) => {
+        const fileName = application.resumeFileName || 'resume';
+        this.openFileDialog('Resume', blob, fileName);
+      },
+      error: (error) => {
+        console.error('Error loading resume:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load resume'
+        });
+      }
+    });
+  }
+}
+
+viewCoverLetter(application: JobApplication) {
+  if (application.coverLetterFileId) {
+    this.employerService.downloadCoverLetter(application.coverLetterFileId).subscribe({
+      next: (blob) => {
+        const fileName = application.coverLetterFileName || 'cover-letter';
+        this.openFileDialog('Cover Letter', blob, fileName);
+      },
+      error: (error) => {
+        console.error('Error loading cover letter:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load cover letter'
+        });
+      }
+    });
+  }
+}
+
+openFileDialog(title: string, blob: Blob, fileName: string): void {
+  this.dialogTitle = title;
+  this.fileType = this.getFileType(fileName, blob.type);
+  
+  switch (this.fileType) {
+    case 'pdf':
+      const pdfUrl = window.URL.createObjectURL(blob);
+      // Add #toolbar=0 to hide PDF toolbar
+      this.dialogFileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl + '#toolbar=0&navpanes=0&scrollbar=0');
+      break;
+      
+    case 'text':
+      this.readTextFile(blob);
+      break;
+      
+    case 'word':
+      this.handleWordFile(blob, fileName);
+      break;
+      
+    case 'unsupported':
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Unsupported Format',
+        detail: 'This file format cannot be previewed. Please download to view.'
+      });
+      return;
+  }
+  
+  this.displayFileDialog = true;
+}
+
+getFileType(fileName: string, mimeType: string): 'pdf' | 'text' | 'word' | 'unsupported' {
+  const extension = fileName.toLowerCase().split('.').pop();
+  
+  if (mimeType === 'application/pdf' || extension === 'pdf') {
+    return 'pdf';
+  }
+  
+  if (mimeType === 'text/plain' || extension === 'txt') {
+    return 'text';
+  }
+  
+  if (mimeType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml') || 
+      mimeType.includes('application/msword') ||
+      extension === 'docx' || extension === 'doc') {
+    return 'word';
+  }
+  
+  return 'unsupported';
+}
+
+readTextFile(blob: Blob): void {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    this.fileContent = e.target?.result as string;
+  };
+  reader.readAsText(blob);
+}
+
+handleWordFile(blob: Blob, fileName: string): void {
+  // For Word files, we'll show a message and provide download option
+  this.messageService.add({
+    severity: 'info',
+    summary: 'Word Document',
+    detail: 'Word documents cannot be previewed directly. Please download to view the full content.'
+  });
+  
+  // Optionally, you could integrate mammoth.js here to convert docx to HTML
+  // But it requires additional library installation
+}
+
+closeFileDialog(): void {
+  this.displayFileDialog = false;
+  if (this.dialogFileUrl && typeof this.dialogFileUrl === 'string') {
+    window.URL.revokeObjectURL(this.dialogFileUrl as string);
+  }
+  this.dialogFileUrl = null;
+  this.fileContent = '';
+}
 
   // ===== CREATE JOB METHODS =====
 
