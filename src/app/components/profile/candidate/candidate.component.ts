@@ -1,13 +1,17 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
+import { Subject, takeUntil } from 'rxjs';
 import { CandidateDashboardStatsDTO } from 'src/app/interfaces/CandidateDashboardStatsDTO';
 import { CandidateProfileDTO } from 'src/app/interfaces/CandidateProfileDTO';
 import { CandidateProfileUpdateDTO } from 'src/app/interfaces/CandidateProfileUpdateDTO';
+import { Job } from 'src/app/interfaces/Job';
 import { JobApplicationDTO } from 'src/app/interfaces/JobApplicationDTO';
 import { PageResponse } from 'src/app/interfaces/PageResponse';
 import { CandidateService } from 'src/app/services/candidate-service.service';
+import { SavedJobService } from 'src/app/services/saved-job.service';
 
 @Component({
   selector: 'app-candidate',
@@ -45,11 +49,18 @@ export class CandidateComponent {
   maxFileSize = 5000000; // 5MB
   acceptedFileTypes = '.pdf,.doc,.docx,.txt';
 
+  // SAVED-JOB DATA
+   savedJobs: Job[] = [];
+  private destroy$ = new Subject<void>();
+
+
   constructor(
     private candidateService: CandidateService,
     private fb: FormBuilder,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private savedJobsService: SavedJobService,
+    private confirmationService: ConfirmationService,
+    private router:Router
   ) {
     this.profileUpdateForm = this.createProfileForm();
   }
@@ -58,6 +69,13 @@ export class CandidateComponent {
     this.loadCandidateProfile();
     this.loadDashboardStats();
     this.loadJobApplications();
+     this.loadSavedJobs();
+    this.subscribeToSavedJobs();
+  }
+
+    ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Form creation
@@ -281,6 +299,183 @@ removeSkill(skill: string): void {
     this.skillsArray.splice(index, 1);
   }
 }
+
+// SAVED-JOB MANAGEMENT
+ /**
+   * Load saved jobs from service
+   */
+  loadSavedJobs(): void {
+    this.loading = true;
+    this.savedJobsService.getSavedJobs()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (jobs) => {
+          console.log(this.savedJobs)
+          this.savedJobs = jobs;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading saved jobs:', error);
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load saved jobs'
+          });
+        }
+      });
+  }
+
+  /**
+   * Subscribe to saved jobs changes
+   */
+  private subscribeToSavedJobs(): void {
+    this.savedJobsService.savedJobs$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(jobs => {
+        this.savedJobs = jobs;
+      });
+  }
+
+  /**
+   * Remove job from saved list
+   */
+  unsaveJob(jobId: string, event: Event): void {
+    event.stopPropagation(); // Prevent navigation to job detail
+    
+    this.savedJobsService.unsaveJob(jobId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Job removed from saved jobs'
+          });
+        },
+        error: (error) => {
+          console.error('Error unsaving job:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to remove job from saved jobs'
+          });
+        }
+      });
+  }
+
+  /**
+   * Navigate to job detail page
+   */
+  viewJobDetail(jobId: string): void {
+    this.router.navigate(['/job-detail', jobId]);
+  }
+
+  /**
+   * Get job type display class
+   */
+  getJobTypeClass(jobType: string): string {
+    switch (jobType?.toLowerCase()) {
+      case 'full_time':
+      case 'full time':
+        return 'FULL_TIME';
+      case 'part_time':
+      case 'part time':
+        return 'PART_TIME';
+      case 'contract':
+        return 'CONTRACT';
+      case 'internship':
+        return 'INTERNSHIP';
+      default:
+        return 'job-type-default';
+    }
+  }
+
+  /**
+   * Get job type display text
+   */
+  getJobTypeText(jobType: string): string {
+    switch (jobType?.toLowerCase()) {
+      case 'full_time':
+        return 'Full Time';
+      case 'part_time':
+        return 'Part Time';
+      case 'contract':
+        return 'Contract';
+      case 'freelance':
+        return 'Freelance';
+      case 'internship':
+        return 'Internship';
+      default:
+        return jobType;
+    }
+  }
+
+  /**
+   * Get experience level display class
+   */
+  getExperienceLevelClass(level: string): string {
+    switch (level?.toLowerCase()) {
+      case 'entry level':
+      case 'entry':
+        return 'exp-level-entry';
+      case 'mid level':
+      case 'mid':
+        return 'exp-level-mid';
+      case 'senior level':
+      case 'senior':
+        return 'exp-level-senior';
+      case 'lead':
+      case 'principal':
+        return 'exp-level-lead';
+      default:
+        return 'exp-level-default';
+    }
+  }
+
+  /**
+   * Format posted date
+   */
+  getPostedTimeAgo(dateString: string): string {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInHours / 24);
+    
+    if (diffInHours < 1) {
+      return 'Posted less than an hour ago';
+    } else if (diffInHours < 24) {
+      return `Posted ${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+    } else if (diffInDays === 1) {
+      return 'Posted 1 day ago';
+    } else {
+      return `Posted ${diffInDays} days ago`;
+    }
+  }
+
+  /**
+   * Truncate text with ellipsis
+   */
+  truncateText(text: string, maxLength: number = 150): string {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  }
+
+  /**
+   * Refresh saved jobs
+   */
+  refreshSavedJobs(): void {
+    this.loadSavedJobs();
+  }
+
+  // Navigation
+  navigateToHome(){
+    this.router.navigate(['/']);
+  }
+
 
   // Pagination
   onPageChange(event: any): void {

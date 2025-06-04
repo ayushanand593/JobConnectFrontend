@@ -62,6 +62,7 @@ import { JobApplyComponent } from './components/home/job/job-apply/job-apply.com
 import { EmployerComponent } from './components/profile/employer/employer.component';
 import { EmployerService } from './services/employer-service.service';
 import { CalendarModule } from 'primeng/calendar';
+import { SavedJobService } from './services/saved-job.service';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -201,6 +202,7 @@ const routes: Routes = [
     JobService,
     CandidateService,
     EmployerService,
+    SavedJobService,
     MessageService,
     ConfirmationService,
     {

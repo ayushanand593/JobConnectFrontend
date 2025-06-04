@@ -424,6 +424,386 @@
 }
   }
 
+.saved-jobs-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .saved-jobs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+
+    .header-content {
+      .header-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+
+        i {
+          color: #2c3e50;
+        }
+      }
+
+      .header-subtitle {
+        color: #6c757d;
+        margin: 0;
+        font-size: 1rem;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+
+    .loading-text {
+      margin-top: 1rem;
+      color: #6c757d;
+      font-size: 1.1rem;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+
+    .empty-icon {
+      font-size: 4rem;
+      color: #dee2e6;
+      margin-bottom: 1rem;
+
+      i {
+        display: block;
+      }
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-description {
+      color: #6c757d;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+  }
+
+  .job-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .job-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-color: #3498db;
+    }
+
+    .job-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+
+      .company-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        flex: 1;
+
+        .company-logo {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: contain; /* Maintains aspect ratio while fitting within bounds */
+  object-position: center;
+  border-radius: 8px;
+  background: #f8f9fa;
+  display: block;
+            .company-logo-cover {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: cover; /* Crops image to fill container */
+  object-position: center;
+  border-radius: 8px;
+  background: #f8f9fa;
+  display: block;
+}
+
+         .company-logo-fallback {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+        }
+
+        .job-basic-info {
+          .job-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 0.25rem 0;
+            line-height: 1.3;
+          }
+
+          .company-name {
+            color: #6c757d;
+            font-size: 0.95rem;
+            font-weight: 500;
+          }
+        }
+      }
+
+    .job-actions {
+  .unsave-btn {
+    /* Target the icon specifically */
+    .pi-bookmark {
+      color: #2c3e50 !important;
+    }
+    
+    /* Also target the button icon class if needed */
+    .p-button-icon {
+      color: #2c3e50 !important;
+    }
+    
+    /* Remove default styling */
+    .p-button {
+      background: transparent !important;
+      border: none !important;
+    }
+    
+    /* Override any hover states if needed */
+    &:hover .pi-bookmark,
+    &:hover .p-button-icon {
+      color: #2c3e50 !important;
+    }
+  }
+}
+    }
+
+    .job-details {
+      .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        span {
+          display: flex;
+          align-items: center;
+          font-size: 0.875rem;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          background: #f8f9fa;
+          color: #495057;
+
+          i {
+            font-size: 0.75rem;
+          }
+        }
+
+        .job-location {
+          background: #e8f4fd;
+          color: #1976d2;
+        }
+
+        .job-type {
+          &.job-type-full-time {
+            background: #e8f5e8;
+            color: #2e7d32;
+          }
+
+          &.job-type-part-time {
+            background: #fff3e0;
+            color: #f57c00;
+          }
+
+          &.job-type-contract {
+            background: #f3e5f5;
+            color: #7b1fa2;
+          }
+
+          &.job-type-freelance {
+            background: #e0f2f1;
+            color: #00695c;
+          }
+
+          &.job-type-internship {
+            background: #fce4ec;
+            color: #c2185b;
+          }
+        }
+
+        .experience-level {
+          &.exp-level-entry {
+            background: #e8f5e8;
+            color: #2e7d32;
+          }
+
+          &.exp-level-mid {
+            background: #fff3e0;
+            color: #f57c00;
+          }
+
+          &.exp-level-senior {
+            background: #e3f2fd;
+            color: #1976d2;
+          }
+
+          &.exp-level-lead {
+            background: #f3e5f5;
+            color: #7b1fa2;
+          }
+        }
+      }
+
+      .salary-range {
+        margin-bottom: 1rem;
+
+        .salary-text {
+          color: #27ae60;
+          font-weight: 600;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+
+          i {
+            color: #27ae60;
+          }
+        }
+      }
+
+      .job-description {
+        margin-bottom: 1rem;
+
+        p {
+          color: #6c757d;
+          line-height: 1.6;
+          margin: 0;
+          font-size: 0.95rem;
+        }
+      }
+
+      .job-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+
+        .skill-tag {
+          background: #e3f2fd;
+          color: #1976d2;
+          padding: 0.25rem 0.75rem;
+          border-radius: 15px;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+
+        .more-skills {
+          color: #6c757d;
+          font-size: 0.8rem;
+          align-self: center;
+          font-style: italic;
+        }
+      }
+    }
+
+    .job-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f3f4;
+
+      .posted-date {
+        color: #6c757d;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+
+        i {
+          font-size: 0.75rem;
+        }
+      }
+
+      .card-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+
+    .deadline-warning {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #fff3cd;
+      color: #856404;
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      border: 1px solid #ffeaa7;
+
+      i {
+        font-size: 0.7rem;
+      }
+    }
+  }
+}
+
   // Upload Dialog
   .upload-content {
     .upload-description {
@@ -537,7 +917,12 @@
       background: #f39c12;
     }
   }
-
+  .job-actions .unsave-btn .p-button .pi-bookmark-fill {
+  color: #2c3e50 !important;
+}
+.pi-bookmark-fill{
+  margin-right: 5px;
+}
   .p-button {
     border-radius: 6px;
     font-weight: 500;

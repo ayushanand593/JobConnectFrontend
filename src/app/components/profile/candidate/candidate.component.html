@@ -327,6 +327,173 @@
           </p-table>
         </div>
       </p-tabPanel>
+
+      <p-tabPanel header="Saved Jobs" leftIcon="pi pi-bookmark-fill">
+        <div class="saved-jobs-container">
+  <!-- Header Section -->
+  <div class="saved-jobs-header">
+    <div class="header-content">
+      <h3 class="header-title">
+        <i class="pi pi-bookmark-fill mr-5"></i>
+        Saved Jobs
+      </h3>
+      <p class="header-subtitle">
+        Jobs you've saved for later review ({{savedJobs.length}} saved)
+      </p>
+    </div>
+    <div class="header-actions">
+      <p-button 
+        label="Refresh" 
+        icon="pi pi-refresh" 
+        (click)="refreshSavedJobs()"
+        severity="secondary"
+        size="small"
+        [loading]="loading">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <p-progressSpinner strokeWidth="3" animationDuration="1s"></p-progressSpinner>
+    <p class="loading-text">Loading your saved jobs...</p>
+  </div>
+
+  <!-- Saved Jobs List -->
+  <div class="saved-jobs-list" *ngIf="!loading">
+    <!-- No Saved Jobs State -->
+    <div class="empty-state" *ngIf="savedJobs.length === 0">
+      <div class="empty-icon">
+        <i class="pi pi-bookmark-filled"></i>
+      </div>
+      <h4 class="empty-title">No Saved Jobs Yet</h4>
+      <p class="empty-description">
+        Browse jobs and save the ones you're interested in to view them here.
+      </p>
+      <p-button 
+        label="Browse Jobs" 
+        icon="pi pi-search" 
+        (click)="navigateToHome()"
+        severity="info">
+      </p-button>
+    </div>
+
+    <!-- Job Cards -->
+    <div class="job-cards-grid" *ngIf="savedJobs.length > 0">
+      <div 
+        class="job-card" 
+        *ngFor="let job of savedJobs"
+        (click)="viewJobDetail(job.jobId)">
+        
+        <!-- Job Card Header -->
+        <div class="job-card-header">
+          <div class="company-info">
+            <div class="company-logo">
+               <img
+      *ngIf="job.logoDataUrl; else companyInitial"
+      [src]="job.logoDataUrl"
+      [alt]="job.companyName + ' logo'"
+      class="company-logo-cover"
+    />
+              <ng-template #companyInitial>
+                <span class="company-logo-fallback">
+                  {{job.companyName.charAt(0).toUpperCase() || 'C'}}
+                </span>
+              </ng-template>
+            </div>
+            <div class="job-basic-info">
+              <h4 class="job-title">{{job.title}}</h4>
+              <span class="company-name">{{job.companyName}}</span>
+            </div>
+          </div>
+          
+          <!-- Unsave Button -->
+          <div class="job-actions">
+            <p-button 
+              icon="pi pi-bookmark-fill" 
+              (click)="unsaveJob(job.jobId, $event)"
+              severity="danger"
+              [text]="true"
+              size="small"
+              class="unsave-btn"
+              pTooltip="Remove from saved jobs"
+              tooltipPosition="top">
+            </p-button>
+          </div>
+        </div>
+
+        <!-- Job Details -->
+        <div class="job-details">
+          <div class="job-meta">
+            <span class="job-location">
+              <i class="pi pi-map-marker mr-1"></i>
+              {{job.location || 'Location not specified'}}
+            </span>
+            
+            <span class="job-type" [ngClass]="getJobTypeClass(job.jobType)">
+              <i class="pi pi-clock mr-1"></i>
+              {{getJobTypeText(job.jobType)}}
+            </span>
+            
+            <span class="experience-level" [ngClass]="getExperienceLevelClass(job.experienceLevel)">
+              <i class="pi pi-user mr-1"></i>
+              {{job.experienceLevel || 'Not specified'}}
+            </span>
+          </div>
+
+          <!-- Salary Range -->
+          <div class="salary-range" *ngIf="job.salaryRange">
+            <span class="salary-text">
+              <i class="pi pi-money-bill mr-1"></i>
+              {{job.salaryRange}}
+            </span>
+          </div>
+
+          <!-- Job Description -->
+          <div class="job-description" *ngIf="job.description">
+            <p>{{truncateText(job.description)}}</p>
+          </div>
+
+          <!-- Skills -->
+          <div class="job-skills" *ngIf="job.skills && job.skills.length > 0">
+            <span class="skill-tag" *ngFor="let skill of job.skills.slice(0, 4)">
+              {{skill}}
+            </span>
+            <span class="more-skills" *ngIf="job.skills.length > 4">
+              +{{job.skills.length - 4}} more
+            </span>
+          </div>
+        </div>
+
+        <!-- Job Card Footer -->
+        <div class="job-card-footer">
+          <div class="posted-date" *ngIf="job.updatedAt">
+            <i class="pi pi-calendar mr-1"></i>
+            <span>{{getPostedTimeAgo(job.updatedAt)}}</span>
+          </div>
+          
+          <div class="card-actions">
+            <p-button 
+              label="View Details" 
+              icon="pi pi-eye" 
+              (click)="viewJobDetail(job.jobId)"
+              severity="info"
+              size="small"
+              [outlined]="true">
+            </p-button>
+          </div>
+        </div>
+
+        <!-- Application Deadline Warning -->
+        <div class="deadline-warning" *ngIf="job.applicationDeadline">
+          <i class="pi pi-exclamation-triangle mr-1"></i>
+          <span>Deadline: {{job.applicationDeadline | date:'MMM dd, yyyy'}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      </p-tabPanel>
     </p-tabView>
   </div>
 

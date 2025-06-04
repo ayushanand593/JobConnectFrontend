@@ -108,6 +108,15 @@
           </div>
         </div>
         <div class="action-buttons">
+             <p-button 
+      [icon]="isJobSaved(job.jobId) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+      (click)="toggleSaveJob(job.jobId, $event)"
+      [text]="true"
+      size="small"
+      class="save-btn"
+      [pTooltip]="isJobSaved(job.jobId) ? 'Remove from saved jobs' : 'Save job'"
+      tooltipPosition="top">
+    </p-button>
           <p-button 
             label="Apply Now" 
             icon="pi pi-send"

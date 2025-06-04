@@ -4,6 +4,7 @@ import { Job } from 'src/app/interfaces/Job';
 import { JobSearchRequest } from 'src/app/interfaces/JobSearchRequest';
 import { PageResponse } from 'src/app/interfaces/PageResponse';
 import { JobService } from 'src/app/services/job.service';
+import { SavedJobService } from 'src/app/services/saved-job.service';
 
 
 @Component({
@@ -34,8 +35,11 @@ export class JobListComponent implements OnInit {
 
   defaultLogoUrl = 'assets/images/default-company-logo.png';
 
+  
+
   constructor(
     private jobSearchService: JobService, 
+     private savedJobService: SavedJobService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -51,6 +55,7 @@ export class JobListComponent implements OnInit {
         this.loadAllJobs();
       }
     });
+    this.savedJobService.refreshSavedJobs();
   }
 
   // Handle search performed from the JobSearchComponent
@@ -175,6 +180,63 @@ export class JobListComponent implements OnInit {
       this.isSearchMode = true;
       this.performSearch();
     }
+  }
+
+  // Saved Job Functionalities
+   /**
+   * Check if a job is saved
+   */
+  isJobSaved(jobId: string): boolean {
+    return this.savedJobService.isJobSavedSync(jobId);
+  }
+
+  /**
+   * Toggle save/unsave job
+   */
+  toggleSaveJob(jobId: string, event: Event): void {
+    event.stopPropagation(); // Prevent navigation to job details
+    
+    if (this.isJobSaved(jobId)) {
+      this.unsaveJob(jobId, event);
+    } else {
+      this.saveJob(jobId, event);
+    }
+  }
+
+  /**
+   * Save a job
+   */
+  saveJob(jobId: string, event: Event): void {
+    event.stopPropagation();
+    
+    this.savedJobService.saveJob(jobId).subscribe({
+      next: (response) => {
+        console.log('Job saved successfully:', response);
+        // Optionally show a toast notification
+      },
+      error: (error) => {
+        console.error('Error saving job:', error);
+        // Handle error - show toast notification
+      }
+    });
+  }
+
+  /**
+   * Unsave a job
+   */
+  unsaveJob(jobId: string, event: Event): void {
+    event.stopPropagation();
+    
+    this.savedJobService.unsaveJob(jobId).subscribe({
+      next: (response) => {
+        console.log('Job unsaved successfully:', response);
+        // Optionally show a toast notification
+      },
+      error: (error) => {
+        console.error('Error unsaving job:', error);
+        // Handle error - show toast notification
+      }
+    });
   }
 
   // Map selectedSort → sortBy & sortDirection on currentSearchRequest

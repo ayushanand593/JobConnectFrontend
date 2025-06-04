@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Job } from 'src/app/interfaces/Job';
 import { JobService } from 'src/app/services/job.service';
+import { SavedJobService } from 'src/app/services/saved-job.service';
 
 @Component({
   selector: 'app-job-detail',
@@ -20,6 +21,7 @@ export class JobDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private jobService: JobService,
+     private savedJobService: SavedJobService,
     private messageService: MessageService
   ) {}
 
@@ -30,6 +32,7 @@ export class JobDetailComponent implements OnInit {
         this.loadJobDetails();
       }
     });
+     this.savedJobService.refreshSavedJobs();
   }
 
   loadJobDetails(): void {
@@ -113,6 +116,63 @@ export class JobDetailComponent implements OnInit {
     });
   }
 }
+
+// Save Job Functionalities
+ /**
+   * Check if current job is saved
+   */
+  isJobSaved(): boolean {
+    return this.job ? this.savedJobService.isJobSavedSync(this.job.jobId) : false;
+  }
+
+  /**
+   * Toggle save/unsave current job
+   */
+  toggleSaveJob(): void {
+    if (!this.job) return;
+    
+    if (this.isJobSaved()) {
+      this.unsaveJob();
+    } else {
+      this.saveJob();
+    }
+  }
+
+  /**
+   * Save current job
+   */
+  saveJob(): void {
+    if (!this.job) return;
+    
+    this.savedJobService.saveJob(this.job.jobId).subscribe({
+      next: (response) => {
+        console.log('Job saved successfully:', response);
+        // Optionally show a toast notification
+      },
+      error: (error) => {
+        console.error('Error saving job:', error);
+        // Handle error - show toast notification
+      }
+    });
+  }
+
+  /**
+   * Unsave current job
+   */
+  unsaveJob(): void {
+    if (!this.job) return;
+    
+    this.savedJobService.unsaveJob(this.job.jobId).subscribe({
+      next: (response) => {
+        console.log('Job unsaved successfully:', response);
+        // Optionally show a toast notification
+      },
+      error: (error) => {
+        console.error('Error unsaving job:', error);
+        // Handle error - show toast notification
+      }
+    });
+  }
 
   goBack(): void {
     this.router.navigate(['/']);
