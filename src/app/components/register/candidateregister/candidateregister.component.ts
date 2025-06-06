@@ -18,16 +18,8 @@ import { ValidationError } from 'src/app/interfaces/ValidationError';
 export class CandidateregisterComponent implements OnInit {
   registrationForm: FormGroup;
   loading = false;
-  skillSuggestions: string[] = [
-    'JavaScript', 'TypeScript', 'Angular', 'React', 'Vue.js', 'Node.js',
-    'Java', 'Spring Boot', 'Python', 'Django', 'Flask', 'C#', '.NET',
-    'PHP', 'Laravel', 'Ruby', 'Rails', 'Go', 'Rust', 'Swift',
-    'HTML', 'CSS', 'SASS', 'Bootstrap', 'Tailwind CSS',
-    'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes',
-    'AWS', 'Azure', 'Google Cloud', 'Git', 'Jenkins', 'CI/CD'
-  ];
   filteredSkills: string[] = [];
-  selectedSkills: string[] = [];
+  skillsArray: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -40,7 +32,7 @@ export class CandidateregisterComponent implements OnInit {
 
   ngOnInit(): void {
     // Initialize filtered skills
-    this.filteredSkills = [...this.skillSuggestions];
+    this.filteredSkills = [...this.skillsArray];
   }
 
   private createForm(): FormGroup {
@@ -54,7 +46,8 @@ export class CandidateregisterComponent implements OnInit {
       headline: ['', [Validators.maxLength(100)]],
       summary: ['', [Validators.maxLength(500)]],
       experienceYears: [null, [Validators.min(0), Validators.max(50)]],
-      termsAccepted: [false, [Validators.requiredTrue]]
+      termsAccepted: [false, [Validators.requiredTrue]],
+       skills: [[]],
     }, {
       validators: this.passwordMatchValidator
     });
@@ -71,79 +64,172 @@ export class CandidateregisterComponent implements OnInit {
   return null;
 }
 
-  onSkillSelect(event: any): void {
-    const skill = event.value;
-    if (skill && !this.selectedSkills.includes(skill)) {
-      this.selectedSkills.push(skill);
-    }
-  }
-
-  removeSkill(skillToRemove: string): void {
-    this.selectedSkills = this.selectedSkills.filter(skill => skill !== skillToRemove);
-  }
-
-  filterSkills(event: any): void {
-    const query = event.query.toLowerCase();
-    this.filteredSkills = this.skillSuggestions.filter(skill => 
-      skill.toLowerCase().includes(query) && !this.selectedSkills.includes(skill)
-    );
-  }
-
-onSubmit(): void {
-  if (this.registrationForm.valid) {
-    this.loading = true;
-    const formValue = this.registrationForm.value;
-    const registrationData: CandidateRegistration = {
-      email: formValue.email.trim(),
-      password: formValue.password,
-      firstName: formValue.firstName.trim(),
-      lastName: formValue.lastName?.trim() || undefined,
-      phone: formValue.phone?.trim() || undefined,
-      headline: formValue.headline?.trim() || undefined,
-      summary: formValue.summary?.trim() || undefined,
-      experienceYears: formValue.experienceYears || undefined,
-      skills: this.selectedSkills.length > 0 ? this.selectedSkills : undefined,
-      termsAccepted: formValue.termsAccepted
-    };
-
-    // Client-side validation
-      const validationErrors = this.registrationService.validateCandidateData(registrationData);
-    if (validationErrors.length > 0) {
-      this.handleValidationErrors(validationErrors);
-      this.loading = false;
-      return;
-    }
-
-    this.registrationService.registerCandidate(registrationData).subscribe({
-      next: (response) => {
-        this.loading = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Registration Successful',
-          detail: 'Welcome! Your account has been created successfully.'
-        });
-        // Only navigate when registration is successful
-        setTimeout(() => {
-          this.router.navigate(['/profile']);
-        }, 1500);
-      },
-         error: (error: RegistrationError) => {
-        this.loading = false;
-        console.error('Registration error:', error); // For debugging
-        this.handleRegistrationError(error);  
-      }
-    });
-  } else {
-    this.markFormGroupTouched();
+onSkillAdd(event: any): void {
+  // For p-chips onAdd event (if using chips instead)
+  const skill = event.value?.trim();
+  if (!skill) return;
+  
+  const skillsControl = this.registrationForm.get('skills');
+  if (!skillsControl) return;
+  
+  const currentSkills: string[] = skillsControl.value || [];
+  
+  // Check for duplicate (case-insensitive)
+  if (currentSkills.some(s => s.toLowerCase() === skill.toLowerCase())) {
+    // Remove the duplicate that was just added
+    const updatedSkills = currentSkills.slice(0, -1);
+    skillsControl.setValue(updatedSkills);
+    
     this.messageService.add({
-      severity: 'error',
-      summary: 'Form Invalid',
-      detail: 'Please correct the errors in the form'
+      severity: 'warn',
+      summary: 'Duplicate Skill',
+      detail: `"${skill}" already exists`
     });
   }
 }
 
+addSkillFromInput(event: any): void {
+  const input = event.target;
+  const value = input.value.trim();
+  
+  if (value) {
+    // Format skill with first letter capitalized
+    const formattedSkill = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    
+    // Check for duplicates case-insensitively
+    if (!this.skillsArray.some(skill => skill.toLowerCase() === formattedSkill.toLowerCase())) {
+      this.skillsArray.push(formattedSkill);
+      // Update the form control with the new array
+      this.registrationForm.patchValue({ skills: this.skillsArray });
+    }
+    
+    // Clear the input
+    input.value = '';
+    event.preventDefault();
+  }
+}
 
+// Also update removeSkillByIndex to sync with form control:
+removeSkillByIndex(index: number): void {
+  this.skillsArray.splice(index, 1);
+  // Update the form control after removing skill
+  this.registrationForm.patchValue({ skills: this.skillsArray });
+}
+
+// Keep these existing methods but make sure they work with skillsArray
+addSkill(event: any): void {
+  const input = event.input;
+  const value = event.value?.trim();
+  
+  if (value && !this.skillsArray.includes(value)) {
+    this.skillsArray.push(value);
+  }
+  
+  if (input) {
+    input.value = '';
+  }
+}
+
+removeSkill(skill: string): void {
+  const index = this.skillsArray.indexOf(skill);
+  if (index >= 0) {
+    this.skillsArray.splice(index, 1);
+  }
+}
+
+onSubmit(): void {
+  this.markFormGroupTouched();
+
+   if (this.registrationForm.invalid) {
+    // Show specific validation errors in toast
+    const errorMessages = this.getFormValidationErrors();
+    
+    errorMessages.forEach(error => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: error
+      });
+    });
+    return;
+  }
+    if (this.registrationForm.valid) {
+      this.loading = true;
+
+      const fv = this.registrationForm.value;
+      const registrationData: CandidateRegistration = {
+        email: fv.email.trim(),
+        password: fv.password,
+        firstName: fv.firstName.trim(),
+        lastName: fv.lastName?.trim() || undefined,
+        phone: fv.phone?.trim() || undefined,
+        headline: fv.headline?.trim() || undefined,
+        summary: fv.summary?.trim() || undefined,
+        experienceYears: fv.experienceYears || undefined,
+        // since `skills` is already a string[] in the form, we pass it
+         skills: this.skillsArray.length > 0 ? this.skillsArray : undefined,
+        termsAccepted: fv.termsAccepted
+      };
+
+      // … the rest of your validation & HTTP‐call logic stays the same …
+      const validationErrors = this.registrationService.validateCandidateData(registrationData);
+      if (validationErrors.length > 0) {
+        this.handleValidationErrors(validationErrors);
+        this.loading = false;
+        return;
+      }
+
+      this.registrationService.registerCandidate(registrationData).subscribe({
+        next: (response: JwtResponse) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Registration Successful',
+            detail: 'Welcome! Your account has been created successfully.'
+          });
+          setTimeout(() => {
+            this.router.navigate(['/profile']);
+          }, 1500);
+        },
+        error: (error: RegistrationError) => {
+          this.loading = false;
+          this.handleRegistrationError(error);
+        }
+      });
+
+    } else {
+      this.markFormGroupTouched();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Form Invalid',
+        detail: 'Please correct the errors in the form'
+      });
+    }
+  }
+
+private getFormValidationErrors(): string[] {
+  const errors: string[] = [];
+  Object.keys(this.registrationForm.controls).forEach(key => {
+    const control = this.registrationForm.get(key);
+    if (control?.errors) {
+      if (control.errors['required']) {
+        errors.push(`${this.getFieldLabel(key)} is required`);
+      }
+      if (control.errors['email']) {
+        errors.push('Please enter a valid email address');
+      }
+      if (control.errors['minlength']) {
+        const reqLength = control.errors['minlength'].requiredLength;
+        errors.push(`${this.getFieldLabel(key)} must be at least ${reqLength} characters`);
+      }
+      if (control.errors['passwordMismatch']) {
+        errors.push('Passwords do not match');
+      }
+      // Add any other specific error messages you need
+    }
+  });
+  return errors;
+}
 
  private handleValidationErrors(errors: ValidationError[]): void {
     errors.forEach(error => {
@@ -171,16 +257,16 @@ onSubmit(): void {
       });
     }
   }
-  handleEnterKey(event: any): void {
-  const input = (event.target as HTMLInputElement).value?.trim();
-  if (input && !this.selectedSkills.includes(input)) {
-    this.selectedSkills.push(input);
-    this.registrationForm.get('skills')?.setValue(this.selectedSkills);
-  }
-  // Clear the input if needed (for p-autoComplete, may need to reset ngModel)
-  (event.target as HTMLInputElement).value = '';
-  event.preventDefault();
-}
+//   handleEnterKey(event: any): void {
+//   const input = (event.target as HTMLInputElement).value?.trim();
+//   if (input && !this.selectedSkills.includes(input)) {
+//     this.selectedSkills.push(input);
+//     this.registrationForm.get('skills')?.setValue(this.selectedSkills);
+//   }
+//   // Clear the input if needed (for p-autoComplete, may need to reset ngModel)
+//   (event.target as HTMLInputElement).value = '';
+//   event.preventDefault();
+// }
 
    private markFormGroupTouched(): void {
     Object.keys(this.registrationForm.controls).forEach(key => {

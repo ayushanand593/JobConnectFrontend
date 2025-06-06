@@ -191,46 +191,48 @@
       </div>
 
       <!-- Skills Section -->
-      <div class="form-section">
-        <h4 class="section-title">Skills</h4>
+<!-- <div class="form-section">
+  <h4 class="section-title">Skills</h4>
+  <div class="form-group">
+  <p-autoComplete
+      formControlName="skills"
+      [suggestions]="filteredSkills"
+      (completeMethod)="filterSkills($event)"
+      (onSelect)="onSkillSelect($event)"
+      (onUnselect)="removeSkill($event)"
+      placeholder="Type to search and add skills"
+      [multiple]="true"
+      [showClear]="true"
+      styleClass="form-autocomplete"
+      inputStyleClass="form-input"
+      [forceSelection]="false"
+    ></p-autoComplete>
+    <small class="hint-text">Press Enter after typing each skill.</small>
+    <small class="error-message" *ngIf="isFieldInvalid('skills')">
+      {{ getFieldError('skills') }}
+    </small>
+  </div>
+</div> -->
 
-        <div class="form-group">
-          <!-- Selected Skills Display -->
-          <div class="selected-skills" *ngIf="selectedSkills.length > 0">
-            <span *ngFor="let skill of selectedSkills" class="skill-chip">
-              {{ skill }}
-              <button
-                type="button"
-                class="remove-skill"
-                (click)="removeSkill(skill)"
-                aria-label="Remove skill"
-              >
-                ×
-              </button>
-            </span>
-          </div>
-
-          <!-- AutoComplete Input -->
-          <p-autoComplete
-            id="skills"
-            [(ngModel)]="selectedSkills"
-            [suggestions]="filteredSkills"
-            (completeMethod)="filterSkills($event)"
-            (onSelect)="onSkillSelect($event)"
-            placeholder="Type to search and add skills"
-            [ngModelOptions]="{ standalone: true }"
-            (keyup.enter)="handleEnterKey($event)"
-            [forceSelection]="false"
-            [multiple]="false"
-            styleClass="form-autocomplete"
-          >
-          </p-autoComplete>
-
-          <!-- Hidden form control -->
-          <input type="hidden" formControlName="skills" [value]="selectedSkills" />
-          <small class="hint-text">Press Enter after typing each skill.</small>
-        </div>
+ <div class="form-section">
+    <h4 class="section-title">Skills</h4>
+    <div class="skills-container">
+      <div class="skills-list">
+        <span 
+          *ngFor="let skill of skillsArray; let i = index" 
+          class="skill-tag"
+          (click)="removeSkillByIndex(i)">
+          {{skill}} <i class="pi pi-times"></i>
+        </span>
       </div>
+      <input 
+        type="text" 
+        pInputText 
+        placeholder="Add skill and press Enter"
+        (keydown.enter)="addSkillFromInput($event)"
+        class="skill-input">
+    </div>
+  </div>
 
       <!-- Terms and Conditions Section -->
       <div class="form-section">
@@ -260,13 +262,11 @@
 
       <!-- Submit Button -->
       <div class="form-actions">
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="registrationForm.invalid || loading"
-        >
-          {{ loading ? 'Creating Account...' : 'Create Account' }}
-        </button>
+      <button
+  type="submit"
+  class="btn btn-primary">
+  {{ loading ? 'Creating Account...' : 'Create Account' }}
+</button>
         <button
           type="button"
           class="btn btn-secondary"
