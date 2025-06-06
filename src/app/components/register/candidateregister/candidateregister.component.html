@@ -1,299 +1,281 @@
+<!-- candidate-registration.component.html -->
 <div class="registration-container">
-  <div class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
-    <div class="text-center mb-5">
-      <div class="text-900 text-3xl font-medium mb-3">Join as a Candidate</div>
-      <span class="text-600 font-medium line-height-3">
-        Create your profile and start your job search journey
-      </span>
+  <div class="registration-card">
+    <!-- Header -->
+    <div class="registration-header">
+      <h3>Join as a Candidate</h3>
+      <p>Create your profile and start your job search journey</p>
     </div>
 
-    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-      <div class="grid">
-        <div class="col-12">
-          <label for="email" class="block text-900 font-medium mb-2">
-            Email Address <span class="text-red-500">*</span>
-          </label>
-          <input
-            pInputText
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder="Enter your email"
-            class="w-full"
-            [class.p-invalid]="isFieldInvalid('email')"
-          />
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('email')"
-          >
-            {{ getFieldError('email') }}
-          </small>
-        </div>
-      </div>
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
 
-      <div class="grid">
-        <div class="col-12 md:col-6">
-          <label for="password" class="block text-900 font-medium mb-2">
-            Password <span class="text-red-500">*</span>
-          </label>
-          <p-password
-            formControlName="password"
-            inputId="password"
-            placeholder="Enter your password"
-            [class.p-invalid]="isFieldInvalid('password')"
-            styleClass="w-full"
-            inputStyleClass="w-full"
-            [feedback]="true"
-            [toggleMask]="true"
-          ></p-password>
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('password')"
-          >
-            {{ getFieldError('password') }}
-          </small>
+      <!-- Account Information Section -->
+      <div class="form-section">
+        <h4 class="section-title">Account Information</h4>
+
+        <div class="form-row">
+          <!-- Email -->
+          <div class="form-group full-width">
+            <label for="email" class="form-label required">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              pInputText
+              formControlName="email"
+              placeholder="Enter your email"
+              [class.ng-invalid]="isFieldInvalid('email')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('email')">
+              {{ getFieldError('email') }}
+            </small>
+          </div>
         </div>
 
-        <div class="col-12 md:col-6">
-          <label for="confirmPassword" class="block text-900 font-medium mb-2">
-            Confirm Password <span class="text-red-500">*</span>
-          </label>
-          <p-password
-            formControlName="confirmPassword"
-            inputId="confirmPassword"
-            placeholder="Confirm your password"
-            [class.p-invalid]="isFieldInvalid('confirmPassword')"
-            styleClass="w-full"
-            inputStyleClass="w-full"
-            [feedback]="false"
-            [toggleMask]="true"
-          ></p-password>
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('confirmPassword')"
-          >
-            {{ getFieldError('confirmPassword') }}
-          </small>
+        <div class="form-row">
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password" class="form-label required">Password</label>
+            <p-password
+              formControlName="password"
+              inputId="password"
+              placeholder="Enter your password"
+              [class.ng-invalid]="isFieldInvalid('password')"
+              styleClass="form-input"
+              inputStyleClass="form-input"
+              [feedback]="true"
+              [toggleMask]="true"
+            ></p-password>
+            <small class="error-message" *ngIf="isFieldInvalid('password')">
+              {{ getFieldError('password') }}
+            </small>
+          </div>
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label required">Confirm Password</label>
+            <p-password
+              formControlName="confirmPassword"
+              inputId="confirmPassword"
+              placeholder="Confirm your password"
+              [class.ng-invalid]="isFieldInvalid('confirmPassword')"
+              styleClass="form-input"
+              inputStyleClass="form-input"
+              [feedback]="false"
+              [toggleMask]="true"
+            ></p-password>
+            <small class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+              {{ getFieldError('confirmPassword') }}
+            </small>
+          </div>
         </div>
       </div>
 
       <!-- Personal Information Section -->
-      <div class="text-900 text-xl font-medium mb-3 mt-4">Personal Information</div>
-      
-      <div class="grid"> 
-        <div class="col-12 md:col-6">
-          <label for="firstName" class="block text-900 font-medium mb-2">
-            First Name <span class="text-red-500">*</span>
-          </label>
-          <input
-            pInputText
-            id="firstName"
-            type="text"
-            formControlName="firstName"
-            placeholder="Enter your first name"
-            class="w-full"
-            [class.p-invalid]="isFieldInvalid('firstName')"
-          />
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('firstName')"
-          >
-            {{ getFieldError('firstName') }}
-          </small>
+      <div class="form-section">
+        <h4 class="section-title">Personal Information</h4>
+
+        <div class="form-row">
+          <!-- First Name -->
+          <div class="form-group">
+            <label for="firstName" class="form-label required">First Name</label>
+            <input
+              id="firstName"
+              type="text"
+              pInputText
+              formControlName="firstName"
+              placeholder="Enter your first name"
+              [class.ng-invalid]="isFieldInvalid('firstName')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('firstName')">
+              {{ getFieldError('firstName') }}
+            </small>
+          </div>
+          <!-- Last Name -->
+          <div class="form-group">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input
+              id="lastName"
+              type="text"
+              pInputText
+              formControlName="lastName"
+              placeholder="Enter your last name"
+              [class.ng-invalid]="isFieldInvalid('lastName')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('lastName')">
+              {{ getFieldError('lastName') }}
+            </small>
+          </div>
         </div>
 
-        <div class="col-12 md:col-6">
-          <label for="lastName" class="block text-900 font-medium mb-2">
-            Last Name
-          </label>
-          <input
-            pInputText
-            id="lastName"
-            type="text"
-            formControlName="lastName"
-            placeholder="Enter your last name"
-            class="w-full"
-            [class.p-invalid]="isFieldInvalid('lastName')"
-          />
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('lastName')"
-          >
-            {{ getFieldError('lastName') }}
-          </small>
-        </div>
-      </div>
-
-      <div class="grid">
-        <div class="col-12 md:col-6">
-          <label for="phone" class="block text-900 font-medium mb-2">
-            Phone Number
-          </label>
-          <input
-            pInputText
-            id="phone"
-            type="tel"
-            formControlName="phone"
-            placeholder="Enter your phone number"
-            class="w-full"
-            [class.p-invalid]="isFieldInvalid('phone')"
-          />
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('phone')"
-          >
-            {{ getFieldError('phone') }}
-          </small>
-        </div>
-
-        <div class="col-12 md:col-6">
-          <label for="experienceYears" class="block text-900 font-medium mb-2">
-            Years of Experience
-          </label>
-          <p-inputNumber
-            formControlName="experienceYears"
-            inputId="experienceYears"
-            placeholder="0"
-            [min]="0"
-            [max]="50"
-            class="w-full"
-            [class.p-invalid]="isFieldInvalid('experienceYears')"
-          ></p-inputNumber>
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('experienceYears')"
-          >
-            {{ getFieldError('experienceYears') }}
-          </small>
+        <div class="form-row">
+          <!-- Phone Number -->
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input
+              id="phone"
+              type="tel"
+              pInputText
+              formControlName="phone"
+              placeholder="Enter your phone number"
+              [class.ng-invalid]="isFieldInvalid('phone')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('phone')">
+              {{ getFieldError('phone') }}
+            </small>
+          </div>
+          <!-- Years of Experience -->
+          <div class="form-group">
+            <label for="experienceYears" class="form-label">Years of Experience</label>
+            <p-inputNumber
+              formControlName="experienceYears"
+              inputId="experienceYears"
+              placeholder="0"
+              [min]="0"
+              [max]="50"
+              [class.ng-invalid]="isFieldInvalid('experienceYears')"
+              styleClass="form-input"
+            ></p-inputNumber>
+            <small class="error-message" *ngIf="isFieldInvalid('experienceYears')">
+              {{ getFieldError('experienceYears') }}
+            </small>
+          </div>
         </div>
       </div>
 
       <!-- Professional Information Section -->
-      <div class="text-900 text-xl font-medium mb-3 mt-4">Professional Information</div>
-      
-      <div class="grid">
-        <div class="col-12">
-          <label for="headline" class="block text-900 font-medium mb-2">
-            Professional Headline
-          </label>
-          <input
-            pInputText
-            id="headline"
-            type="text"
-            formControlName="headline"
-            placeholder="e.g., Full Stack Developer | React & Node.js Expert"
-            class="w-full"
-            [class.p-invalid]="isFieldInvalid('headline')"
-          />
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('headline')"
-          >
-            {{ getFieldError('headline') }}
-          </small>
-          <small class="text-500">Max 100 characters</small>
+      <div class="form-section">
+        <h4 class="section-title">Professional Information</h4>
+
+        <div class="form-row">
+          <!-- Headline -->
+          <div class="form-group full-width">
+            <label for="headline" class="form-label">Professional Headline</label>
+            <input
+              id="headline"
+              type="text"
+              pInputText
+              formControlName="headline"
+              placeholder="e.g., Full Stack Developer | React & Node.js Expert"
+              [class.ng-invalid]="isFieldInvalid('headline')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('headline')">
+              {{ getFieldError('headline') }}
+            </small>
+            <small class="hint-text">Max 100 characters</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Summary -->
+          <div class="form-group full-width">
+            <label for="summary" class="form-label">Professional Summary</label>
+            <textarea
+              id="summary"
+              pInputTextarea
+              formControlName="summary"
+              placeholder="Brief description of your professional background and expertise"
+              rows="4"
+              [class.ng-invalid]="isFieldInvalid('summary')"
+              class="form-textarea"
+            ></textarea>
+            <small class="error-message" *ngIf="isFieldInvalid('summary')">
+              {{ getFieldError('summary') }}
+            </small>
+            <small class="hint-text">Max 500 characters</small>
+          </div>
         </div>
       </div>
 
-      <div class="grid">
-        <div class="col-12">
-          <label for="summary" class="block text-900 font-medium mb-2">
-            Professional Summary
-          </label>
-          <textarea
-            pInputTextarea
-            id="summary"
-            formControlName="summary"
-            placeholder="Brief description of your professional background and expertise"
-            rows="4"
-            class="w-full"
-            [class.p-invalid]="isFieldInvalid('summary')"
-          ></textarea>
-          <small 
-            class="p-error block" 
-            *ngIf="isFieldInvalid('summary')"
-          >
-            {{ getFieldError('summary') }}
-          </small>
-          <small class="text-500">Max 500 characters</small>
-        </div>
-      </div>
+      <!-- Skills Section -->
+      <div class="form-section">
+        <h4 class="section-title">Skills</h4>
 
-      <div class="grid">
-        <div class="col-12">
-          <label class="block text-900 font-medium mb-2">Skills</label>
+        <div class="form-group">
+          <!-- Selected Skills Display -->
+          <div class="selected-skills" *ngIf="selectedSkills.length > 0">
+            <span *ngFor="let skill of selectedSkills" class="skill-chip">
+              {{ skill }}
+              <button
+                type="button"
+                class="remove-skill"
+                (click)="removeSkill(skill)"
+                aria-label="Remove skill"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+
+          <!-- AutoComplete Input -->
           <p-autoComplete
+            id="skills"
             [(ngModel)]="selectedSkills"
             [suggestions]="filteredSkills"
             (completeMethod)="filterSkills($event)"
             (onSelect)="onSkillSelect($event)"
             placeholder="Type to search and add skills"
-            [ngModelOptions]="{standalone: true}"
-            class="w-full"
-          ></p-autoComplete>
-          
-          <!-- Selected Skills Display -->
-          <div class="mt-2" *ngIf="selectedSkills.length > 0">
-            <span class="text-900 font-medium">Selected Skills:</span>
-            <div class="flex flex-wrap gap-2 mt-2">
-              <p-chip 
-                *ngFor="let skill of selectedSkills; trackBy: trackBySkill"
-                [label]="skill"
-                [removable]="true"
-                (onRemove)="removeSkill(skill)"
-                styleClass="p-chip-primary"
-              ></p-chip>
-            </div>
-          </div>
+            [ngModelOptions]="{ standalone: true }"
+            (keyup.enter)="handleEnterKey($event)"
+            [forceSelection]="false"
+            [multiple]="false"
+            styleClass="form-autocomplete"
+          >
+          </p-autoComplete>
+
+          <!-- Hidden form control -->
+          <input type="hidden" formControlName="skills" [value]="selectedSkills" />
+          <small class="hint-text">Press Enter after typing each skill.</small>
         </div>
       </div>
 
-      <!-- Terms and Conditions -->
-      <div class="grid mt-4">
-        <div class="col-12">
-          <div class="flex align-items-center">
+      <!-- Terms and Conditions Section -->
+      <div class="form-section">
+        <h4 class="section-title">Terms and Conditions</h4>
+
+        <div class="form-group">
+          <div class="checkbox-wrapper">
             <p-checkbox
               formControlName="termsAccepted"
               inputId="termsAccepted"
               [binary]="true"
-              [class.p-invalid]="isFieldInvalid('termsAccepted')"
+              [class.ng-invalid]="isFieldInvalid('termsAccepted')"
             ></p-checkbox>
-            <label for="termsAccepted" class="ml-2">
-              I agree to the 
-              <a href="/terms" target="_blank" class="text-primary font-medium">Terms and Conditions</a>
-              and 
-              <a href="/privacy" target="_blank" class="text-primary font-medium">Privacy Policy</a>
-              <span class="text-red-500">*</span>
+            <label for="termsAccepted" class="form-label checkbox-label">
+              I agree to the
+              <a href="/terms" target="_blank" class="link">Terms and Conditions</a>
+              and
+              <a href="/privacy" target="_blank" class="link">Privacy Policy</a>
+              <span class="required">*</span>
             </label>
           </div>
-          <small 
-            class="p-error block ml-4" 
-            *ngIf="isFieldInvalid('termsAccepted')"
-          >
+          <small class="error-message" *ngIf="isFieldInvalid('termsAccepted')">
             {{ getFieldError('termsAccepted') }}
           </small>
         </div>
       </div>
 
       <!-- Submit Button -->
-      <p-button
-        type="submit"
-        label="Create Account"
-        styleClass="w-full mt-4"
-        [loading]="loading"
-        [disabled]="registrationForm.invalid || loading"
-      ></p-button>
-
-      <!-- Login Link -->
-      <div class="text-center mt-4">
-        <span class="text-600">Already have an account? </span>
-        <a (click)="navigateToLogin()" class="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
-          Sign In
-        </a>
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="registrationForm.invalid || loading"
+        >
+          {{ loading ? 'Creating Account...' : 'Create Account' }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="navigateToLogin()"
+        >
+          Already have an account? Sign In
+        </button>
       </div>
+
     </form>
   </div>
-
-  <!-- REMOVE THIS LINE - p-toast is now in app.component.html -->
-  <!-- <p-toast position="top-right"></p-toast> -->
 </div>

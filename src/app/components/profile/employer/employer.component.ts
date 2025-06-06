@@ -129,6 +129,7 @@ jobStatusOptions = [
   }
 
 ngOnInit() {
+  console.log(this.profile);
   this.route.queryParams.subscribe(params => {
     if (params['tab']) {
       this.activeTab = parseInt(params['tab'], 10);
@@ -178,30 +179,46 @@ ngOnInit() {
   }
 
   // ===== PROFILE TAB METHODS =====
-  loadProfile() {
-    this.profileLoading = true;
-    this.employerService.getMyProfile().subscribe({
-      next: (profile) => {
-        this.profile = profile;
+ loadProfile() {
+  this.profileLoading = true;
+  this.employerService.getMyProfile().subscribe({
+    next: (profile) => {
+      console.log('Profile loaded:', profile); // Debug log
+      this.profile = profile;
+      if (profile) {
         this.profileForm.patchValue({
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-          phone: profile.phone,
-          jobTitle: profile.jobTitle
+          firstName: profile.firstName || '',
+          lastName: profile.lastName || '',
+          phone: profile.phone || '',
+          jobTitle: profile.jobTitle || ''
         });
-        this.profileLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading profile:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load profile'
-        });
-        this.profileLoading = false;
       }
-    });
-  }
+      this.profileLoading = false;
+    },
+    error: (error) => {
+      console.error('Error loading profile:', error);
+      
+      // More specific error handling
+      let errorMessage = 'Failed to load profile';
+      if (error.status === 401) {
+        errorMessage = 'Please log in again';
+        // Redirect to login
+        this.router.navigate(['/login']);
+      } else if (error.status === 403) {
+        errorMessage = 'Access denied. Please check your permissions.';
+      } else if (error.status === 404) {
+        errorMessage = 'Profile not found. Please contact support.';
+      }
+      
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: errorMessage
+      });
+      this.profileLoading = false;
+    }
+  });
+}
 
   toggleEdit() {
     this.editing = !this.editing;
@@ -271,6 +288,15 @@ ngOnInit() {
       this.loadDashboardStats();
     }
   }
+
+  getInitials(): string {
+  if (!this.profile) return '';
+  
+  const firstInitial = this.profile.firstName?.charAt(0) || '';
+  const lastInitial = this.profile.lastName?.charAt(0) || '';
+  
+  return `${firstInitial}${lastInitial}`;
+}
 
   // ===== JOBS TAB METHODS =====
   loadJobs() {
@@ -683,8 +709,8 @@ closeFileDialog(): void {
       jobType: ['', Validators.required],
       experienceLevel: [''],
       description: ['', [Validators.required, Validators.minLength(50), Validators.maxLength(5000)]],
-      requirements: ['', [Validators.maxLength(3000)]],
-      responsibilities: ['', [Validators.maxLength(3000)]],
+      requirements: ['', [Validators.maxLength(5000)]],
+      responsibilities: ['', [Validators.maxLength(5000)]],
       salaryRange: ['', [Validators.maxLength(50)]],
       skills: [[]],
       applicationDeadline: [''],

@@ -136,6 +136,8 @@
                           size="small"
                           class="ml-2">
                 </p-button>
+                <p-button *ngIf="candidateProfile.resumeFileId!=null" label="View Resume" icon="pi pi-eye" (click)="viewResume()" severity="info" size="small"
+                          class="ml-2"></p-button>
               </div>
             </div>
             
@@ -328,7 +330,7 @@
         </div>
       </p-tabPanel>
 
-      <p-tabPanel header="Saved Jobs" leftIcon="pi pi-bookmark-fill">
+      <p-tabPanel header="Saved Jobs" leftIcon="pi pi-bookmark-fill" >
         <div class="saved-jobs-container">
   <!-- Header Section -->
   <div class="saved-jobs-header">
@@ -686,6 +688,10 @@
       </div>
     </ng-template>
   </p-dialog>
+
+ <p-dialog header="{{ dialogTitle }}" [(visible)]="displayFileDialog" [modal]="true" [maximizable]="true" [style]="{'width': '80vw'}" [baseZIndex]="10000">
+  <iframe *ngIf="dialogFileUrl" [src]="dialogFileUrl" width="100%" height="600px" frameborder="0"></iframe>
+</p-dialog>
 
   <!-- Toast Messages -->
   <p-toast position="top-right"></p-toast>

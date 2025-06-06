@@ -48,19 +48,19 @@ export class EmployeeregisterComponent {
     // Component initialization
   }
 
-  private createForm(): FormGroup {
-    return this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required]],
-      companyUniqueId: ['', [Validators.required]],
-      firstName:['',[Validators.required]],
-      // lastName:['',[Validators.required]],
-      termsAccepted: [false, [Validators.requiredTrue]]
-    }, {
-      validators: this.passwordMatchValidator
-    });
-  }
+private createForm(): FormGroup {
+  return this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ['', [Validators.required]],
+    companyUniqueId: ['', [Validators.required]],
+    firstName: ['', [Validators.required]],
+    lastName: [''], // Optional field
+    termsAccepted: [false, [Validators.requiredTrue]]
+  }, {
+    validators: this.passwordMatchValidator
+  });
+}
 
 private passwordMatchValidator(form: FormGroup) {
   const password = form.get('password')?.value;
@@ -73,7 +73,7 @@ private passwordMatchValidator(form: FormGroup) {
   return null;
 }
 
-  onSubmit(): void {
+onSubmit(): void {
   if (this.registrationForm.valid) {
     this.loading = true;
 
@@ -83,16 +83,9 @@ private passwordMatchValidator(form: FormGroup) {
       password: formValue.password,
       companyUniqueId: formValue.companyUniqueId.trim(),
       firstName: formValue.firstName.trim(),
+      lastName: formValue.lastName?.trim() || '', // Handle optional lastName
       termsAccepted: formValue.termsAccepted
     };
-
-    // Client-side validation
-    const validationErrors = this.registrationService.validateEmployerData(registrationData);
-    if (validationErrors.length > 0) {
-      this.handleValidationErrors(validationErrors);
-      this.loading = false;
-      return;
-    }
 
     // Submit registration
     this.registrationService.registerEmployer(registrationData).subscribe({
@@ -101,17 +94,17 @@ private passwordMatchValidator(form: FormGroup) {
         this.messageService.add({
           severity: 'success',
           summary: 'Registration Successful',
-          detail: 'Welcome! Your company account has been created successfully.'
+          detail: 'Welcome! Your employer account has been created successfully.'
         });
         
-        // Small delay before navigation to show success message
+        // Navigate to profile page
         setTimeout(() => {
-          this.router.navigate(['/profile']);
+          this.router.navigate(['/employer/dashboard']);
         }, 1500);
       },
       error: (error: RegistrationError) => {
         this.loading = false;
-        console.error('Registration error:', error); // For debugging
+        console.error('Registration error:', error);
         this.handleRegistrationError(error);  
       }
     });

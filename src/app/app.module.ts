@@ -89,7 +89,7 @@ const routes: Routes = [
   { 
     path: 'job-detail/:jobId', 
     component: JobDetailComponent,
-    canActivate: [AuthGuard]
+    canActivate: [GuestGuard]
   },
     {
     path: 'jobs/:jobId/apply',

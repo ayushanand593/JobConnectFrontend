@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Job } from 'src/app/interfaces/Job';
+import { AuthService } from 'src/app/services/auth-service.service';
 import { JobService } from 'src/app/services/job.service';
 import { SavedJobService } from 'src/app/services/saved-job.service';
 
@@ -16,12 +17,14 @@ export class JobDetailComponent implements OnInit {
   loading = true;
   error = false;
   jobId: string = '';
+  role:boolean=false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private jobService: JobService,
      private savedJobService: SavedJobService,
+     private authService:AuthService,
     private messageService: MessageService
   ) {}
 
@@ -33,6 +36,7 @@ export class JobDetailComponent implements OnInit {
       }
     });
      this.savedJobService.refreshSavedJobs();
+     this.role=this.authService.hasRole("CANDIDATE");
   }
 
   loadJobDetails(): void {

@@ -171,6 +171,16 @@ onSubmit(): void {
       });
     }
   }
+  handleEnterKey(event: any): void {
+  const input = (event.target as HTMLInputElement).value?.trim();
+  if (input && !this.selectedSkills.includes(input)) {
+    this.selectedSkills.push(input);
+    this.registrationForm.get('skills')?.setValue(this.selectedSkills);
+  }
+  // Clear the input if needed (for p-autoComplete, may need to reset ngModel)
+  (event.target as HTMLInputElement).value = '';
+  event.preventDefault();
+}
 
    private markFormGroupTouched(): void {
     Object.keys(this.registrationForm.controls).forEach(key => {

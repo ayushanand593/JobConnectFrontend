@@ -108,7 +108,7 @@
           </div>
         </div>
         <div class="action-buttons">
-             <p-button 
+             <p-button *ngIf="role"
       [icon]="isJobSaved(job.jobId) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
       (click)="toggleSaveJob(job.jobId, $event)"
       [text]="true"

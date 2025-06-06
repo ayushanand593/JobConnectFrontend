@@ -41,7 +41,7 @@
           <div class="job-title-row">
             <h1 class="job-title">{{job.title}}</h1>
             <div class="job-actions">
-              <p-button 
+              <p-button *ngIf="role"
       [icon]="isJobSaved() ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
       (click)="toggleSaveJob()"
       [text]="true"
@@ -50,7 +50,7 @@
       [pTooltip]="isJobSaved() ? 'Remove from saved jobs' : 'Save job'"
       tooltipPosition="top">
     </p-button>
-    
+
               <p-button 
                 label="Apply Now" 
                 icon="pi pi-send" 

@@ -24,6 +24,10 @@
 
           <div class="profile-content" *ngIf="profile">
             <!-- View Mode -->
+               <div *ngIf="!profileLoading && !profile" class="error-state">
+    <p>Unable to load profile. Please try refreshing the page.</p>
+    <p-button label="Refresh" icon="pi pi-refresh" (click)="loadProfile()"></p-button>
+  </div>
             <div *ngIf="!editing" class="profile-view">
               <div class="profile-avatar">
                 <img 
@@ -31,11 +35,11 @@
                   [src]="profile.profilePictureUrl" 
                   alt="Profile Picture"
                   class="avatar-img">
-                <ng-template #defaultAvatar>
-                  <div class="default-avatar">
-                    {{ profile.firstName.charAt(0) }}{{ profile.lastName.charAt(0) }}
-                  </div>
-                </ng-template>
+       <ng-template #defaultAvatar>
+  <div class="default-avatar">
+    {{ getInitials() }}
+  </div>
+</ng-template>
               </div>
 
               <div class="profile-details">

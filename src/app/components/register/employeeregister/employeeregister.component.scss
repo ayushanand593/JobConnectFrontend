@@ -1,0 +1,335 @@
+/* employer-registration.component.scss */
+
+/* ───────────────────────────────────────────────────────────
+   Container & Card
+─────────────────────────────────────────────────────────── */
+.registration-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: #f4f6f9;
+  min-height: 100vh;
+}
+
+.registration-card {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───────────────────────────────────────────────────────────
+   Header (Gradient Banner)
+─────────────────────────────────────────────────────────── */
+.registration-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Form Wrapper
+─────────────────────────────────────────────────────────── */
+.registration-form {
+  padding: 2rem;
+  background: white;
+  border-top: 1px solid #e1e8ed;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───────────────────────────────────────────────────────────
+   Form Sections
+─────────────────────────────────────────────────────────── */
+.form-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e1e8ed;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .section-title {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 0 1.2rem 0;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #e8f4fd;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    &::before {
+      content: '';
+      width: 5px;
+      height: 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 3px;
+    }
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Layout: Rows & Groups
+─────────────────────────────────────────────────────────── */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Labels
+─────────────────────────────────────────────────────────── */
+.form-label {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+
+  &.required::after {
+    content: ' *';
+    color: #e74c3c;
+    font-weight: bold;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Inputs & Textareas
+─────────────────────────────────────────────────────────── */
+.form-input,
+.form-textarea {
+  padding: 0.9rem 1.2rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+  background: white;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &::placeholder {
+    color: #a0aec0;
+    font-style: italic;
+  }
+
+  &.ng-invalid.ng-touched {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+/* ───────────────────────────────────────────────────────────
+   PrimeNG Component Overrides (Password, Checkbox, etc.)
+─────────────────────────────────────────────────────────── */
+::ng-deep {
+  /* PrimeNG Password (p-password) uses the same internal <input> styling. */
+  .form-input {
+    /* These rules ensure the <input> inside p-password, p-inputText, etc. use our form-input styling */
+  }
+
+  /* Checkbox override */
+  .checkbox-wrapper .p-checkbox {
+    margin-right: 0.5rem;
+
+    .p-checkbox-box {
+      border: 2px solid #e1e8ed !important;
+      border-radius: 4px !important;
+      width: 1.2rem !important;
+      height: 1.2rem !important;
+    }
+
+    &.ng-invalid .p-checkbox-box {
+      border-color: #e74c3c !important;
+    }
+
+    .p-checkbox-box.p-highlight {
+      background-color: #667eea !important;
+      border-color: #667eea !important;
+    }
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Hints & Error Messages
+─────────────────────────────────────────────────────────── */
+.error-message {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: -0.4rem;
+}
+
+.text-hint {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+/* ───────────────────────────────────────────────────────────
+   Terms & Conditions (Checkbox wrapper & Links)
+─────────────────────────────────────────────────────────── */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .checkbox-label {
+    font-size: 1.05rem;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .required {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+
+  .link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    margin: 0 0.2rem;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Form Actions (Buttons + Link button)
+─────────────────────────────────────────────────────────── */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.9rem 1.2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: inline-block;
+
+  &.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-secondary {
+    background: #e1e8ed;
+    color: #2c3e50;
+
+    &:hover:not(:disabled) {
+      background: #d1dade;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-link {
+    background: none;
+    color: #667eea;
+    padding: 0;
+    font-size: 1rem;
+    text-decoration: underline;
+    transition: none;
+
+    &:hover:not(:disabled) {
+      color: #764ba2;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Text Center & Spacing Helpers
+─────────────────────────────────────────────────────────── */
+.text-center {
+  text-align: center;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+

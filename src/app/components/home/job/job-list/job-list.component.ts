@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Job } from 'src/app/interfaces/Job';
 import { JobSearchRequest } from 'src/app/interfaces/JobSearchRequest';
 import { PageResponse } from 'src/app/interfaces/PageResponse';
+import { AuthService } from 'src/app/services/auth-service.service';
 import { JobService } from 'src/app/services/job.service';
 import { SavedJobService } from 'src/app/services/saved-job.service';
 
@@ -35,11 +36,12 @@ export class JobListComponent implements OnInit {
 
   defaultLogoUrl = 'assets/images/default-company-logo.png';
 
-  
+  role:boolean = false;
 
   constructor(
     private jobSearchService: JobService, 
      private savedJobService: SavedJobService,
+     private authService:AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -56,6 +58,7 @@ export class JobListComponent implements OnInit {
       }
     });
     this.savedJobService.refreshSavedJobs();
+  this.role=this.authService.hasRole("CANDIDATE");
   }
 
   // Handle search performed from the JobSearchComponent

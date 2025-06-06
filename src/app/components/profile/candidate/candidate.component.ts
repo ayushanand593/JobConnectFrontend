@@ -1,4 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -12,6 +13,7 @@ import { JobApplicationDTO } from 'src/app/interfaces/JobApplicationDTO';
 import { PageResponse } from 'src/app/interfaces/PageResponse';
 import { CandidateService } from 'src/app/services/candidate-service.service';
 import { SavedJobService } from 'src/app/services/saved-job.service';
+import { EmployerService } from 'src/app/services/employer-service.service';
 
 @Component({
   selector: 'app-candidate',
@@ -53,6 +55,12 @@ export class CandidateComponent {
    savedJobs: Job[] = [];
   private destroy$ = new Subject<void>();
 
+  // View Resume
+ displayFileDialog: boolean = false;
+  dialogTitle: string = '';
+  dialogFileUrl: SafeResourceUrl | null = null;
+  fileType: 'pdf' | 'text' | 'word' | 'unsupported' = 'pdf';
+  fileContent: string = '';
 
   constructor(
     private candidateService: CandidateService,
@@ -60,6 +68,8 @@ export class CandidateComponent {
     private messageService: MessageService,
     private savedJobsService: SavedJobService,
     private confirmationService: ConfirmationService,
+    private sanitizer: DomSanitizer,
+    private employerService:EmployerService,
     private router:Router
   ) {
     this.profileUpdateForm = this.createProfileForm();
@@ -519,6 +529,110 @@ removeSkill(skill: string): void {
         this.markFormGroupTouched(control);
       }
     });
+  }
+   // Function to view resume
+  viewResume(): void {
+    if (this.candidateProfile && this.candidateProfile.resumeFileId) {
+      this.employerService.downloadResume(this.candidateProfile.resumeFileId).subscribe({
+        next: (blob: Blob) => {
+          const fileName = this.candidateProfile?.resumeFileName || 'resume';
+          this.openFileDialog('Resume', blob, fileName);
+        },
+        error: (error: any) => {
+          console.error('Error loading resume:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load resume'
+          });
+        }
+      });
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Resume',
+        detail: 'You have not uploaded a resume yet.'
+      });
+    }
+  }
+
+  // Opens the preview dialog
+  openFileDialog(title: string, blob: Blob, fileName: string): void {
+    this.dialogTitle = title;
+    this.fileType = this.getFileType(fileName, blob.type);
+
+    switch (this.fileType) {
+      case 'pdf':
+        const pdfUrl = window.URL.createObjectURL(blob);
+        // Add #toolbar=0 to hide PDF toolbar
+        this.dialogFileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl + '#toolbar=0&navpanes=0&scrollbar=0');
+        break;
+
+      case 'text':
+        this.readTextFile(blob);
+        break;
+
+      case 'word':
+        this.handleWordFile(blob, fileName);
+        break;
+
+      case 'unsupported':
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Unsupported Format',
+          detail: 'This file format cannot be previewed. Please download to view.'
+        });
+        return;
+    }
+
+    this.displayFileDialog = true;
+  }
+
+  // Determines file type based on MIME type and file extension
+  getFileType(fileName: string, mimeType: string): 'pdf' | 'text' | 'word' | 'unsupported' {
+    const extension = fileName.toLowerCase().split('.').pop();
+    if (mimeType === 'application/pdf' || extension === 'pdf') {
+      return 'pdf';
+    }
+    if (mimeType === 'text/plain' || extension === 'txt') {
+      return 'text';
+    }
+    if (
+      mimeType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml') ||
+      mimeType.includes('application/msword') ||
+      extension === 'docx' || extension === 'doc'
+    ) {
+      return 'word';
+    }
+    return 'unsupported';
+  }
+
+  // Reads text file content
+  readTextFile(blob: Blob): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.fileContent = e.target?.result as string;
+    };
+    reader.readAsText(blob);
+  }
+
+  // Handles Word file preview; in this example we just show an info message
+  handleWordFile(blob: Blob, fileName: string): void {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Word Document',
+      detail: 'Word documents cannot be previewed directly. Please download to view the full content.'
+    });
+  }
+
+  // Closes the file preview dialog
+  closeFileDialog(): void {
+    this.displayFileDialog = false;
+    if (this.dialogFileUrl && typeof this.dialogFileUrl === 'string') {
+      window.URL.revokeObjectURL(this.dialogFileUrl as string);
+    }
+    this.dialogFileUrl = null;
+    this.fileContent = '';
   }
 
   // Form validation helpers

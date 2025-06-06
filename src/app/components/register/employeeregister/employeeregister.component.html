@@ -1,126 +1,192 @@
+<!-- employer-registration.component.html -->
 <div class="registration-container">
-  <div class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
-    <div class="text-center mb-5">
-      <div class="text-900 text-3xl font-medium mb-3">Join as an Employer</div>
-      <span class="text-600 font-medium line-height-3">
-        Create your company account and start posting jobs
-      </span>
+  <div class="registration-card">
+    <!-- Header -->
+    <div class="registration-header">
+      <h3>Join as an Employer</h3>
+      <p>Create your company account and start posting jobs</p>
     </div>
 
-    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-      <!-- Email and Password -->
-      <div class="grid">
-        <div class="col-12">
-          <label for="email" class="block text-900 font-medium mb-2">Email <span class="text-red-500">*</span></label>
-          <input pInputText id="email" type="email" formControlName="email" placeholder="Enter your email"
-            class="w-full" [class.p-invalid]="isFieldInvalid('email')" />
-          <small class="p-error block" *ngIf="isFieldInvalid('email')">
-            {{ getFieldError('email') }}
-          </small>
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
+      <!-- ─────────────────────────────────────────────────────────────────────────
+         Account Information Section
+      ───────────────────────────────────────────────────────────────────────── -->
+      <div class="form-section">
+        <h4 class="section-title">Account Information</h4>
+
+        <div class="form-row">
+          <!-- Email -->
+          <div class="form-group full-width">
+            <label for="email" class="form-label required">Email</label>
+            <input
+              id="email"
+              type="email"
+              pInputText
+              formControlName="email"
+              placeholder="Enter your email"
+              [class.ng-invalid]="isFieldInvalid('email')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('email')">
+              {{ getFieldError('email') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password" class="form-label required">Password</label>
+            <p-password
+              formControlName="password"
+              inputId="password"
+              placeholder="Enter your password"
+              [class.ng-invalid]="isFieldInvalid('password')"
+              styleClass="form-input"
+              inputStyleClass="form-input"
+              [feedback]="true"
+              [toggleMask]="true"
+            ></p-password>
+            <small class="error-message" *ngIf="isFieldInvalid('password')">
+              {{ getFieldError('password') }}
+            </small>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label required">Confirm Password</label>
+            <p-password
+              formControlName="confirmPassword"
+              inputId="confirmPassword"
+              placeholder="Confirm your password"
+              [class.ng-invalid]="isFieldInvalid('confirmPassword')"
+              styleClass="form-input"
+              inputStyleClass="form-input"
+              [feedback]="false"
+              [toggleMask]="true"
+            ></p-password>
+            <small class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+              {{ getFieldError('confirmPassword') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Password Mismatch Message (at form level) -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <small
+              class="error-message"
+              *ngIf="registrationForm.errors?.['passwordMismatch'] && (registrationForm.dirty || registrationForm.touched)"
+            >
+              Passwords do not match
+            </small>
+          </div>
         </div>
       </div>
 
-      <div class="grid">
-        <div class="col-12 md:col-6">
-          <label for="password" class="block text-900 font-medium mb-2">Password <span class="text-red-500">*</span></label>
-          <p-password formControlName="password" inputId="password" placeholder="Enter your password"
-            [class.p-invalid]="isFieldInvalid('password')" styleClass="w-full" inputStyleClass="w-full" [feedback]="true"
-            [toggleMask]="true"></p-password>
-         <div *ngIf="registrationForm.errors?.['passwordMismatch'] && (registrationForm.dirty || registrationForm.touched)">
-  <small class="p-error">Passwords do not match</small>
-</div>
+      <!-- ─────────────────────────────────────────────────────────────────────────
+         Company Information Section
+      ───────────────────────────────────────────────────────────────────────── -->
+      <div class="form-section">
+        <h4 class="section-title">Company Information</h4>
+
+        <div class="form-row">
+          <!-- First Name -->
+          <div class="form-group">
+            <label for="firstName" class="form-label required">First Name</label>
+            <input
+              id="firstName"
+              type="text"
+              pInputText
+              formControlName="firstName"
+              placeholder="Your first name"
+              [class.ng-invalid]="isFieldInvalid('firstName')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('firstName')">
+              {{ getFieldError('firstName') }}
+            </small>
+          </div>
         </div>
 
-        <div class="col-12 md:col-6">
-          <label for="confirmPassword" class="block text-900 font-medium mb-2">Confirm Password <span
-              class="text-red-500">*</span></label>
-          <p-password formControlName="confirmPassword" inputId="confirmPassword" placeholder="Confirm your password"
-            [class.p-invalid]="isFieldInvalid('confirmPassword')" styleClass="w-full" inputStyleClass="w-full"
-            [feedback]="false" [toggleMask]="true"></p-password>
-          <small class="p-error block" *ngIf="isFieldInvalid('confirmPassword')">
-            {{ getFieldError('confirmPassword') }}
-          </small>
-        </div>
-      </div>
-
-      <!-- Company Info -->
-      <div class="text-900 text-xl font-medium mb-3 mt-4">Company Information</div>
-
-      <div class="grid">
-        <div class="col-12 md:col-6">
-          <label for="firstName" class="block text-900 font-medium mb-2">First Name <span class="text-red-500">*</span></label>
-          <input pInputText id="firstName" type="text" formControlName="firstName" placeholder="Your first name"
-            class="w-full" [class.p-invalid]="isFieldInvalid('firstName')" />
-          <small class="p-error block" *ngIf="isFieldInvalid('firstName')">
-            {{ getFieldError('firstName') }}
-          </small>
-        </div>
-
-        <!-- <div class="col-12 md:col-6">
-          <label for="lastName" class="block text-900 font-medium mb-2">Last Name</label>
-          <input pInputText id="lastName" type="text" formControlName="lastName" placeholder="Your last name"
-            class="w-full" [class.p-invalid]="isFieldInvalid('lastName')" />
-          <small class="p-error block" *ngIf="isFieldInvalid('lastName')">
-            {{ getFieldError('lastName') }}
-          </small>
-        </div> -->
-      </div>
-
-      <div class="grid">
-        <div class="col-12">
-          <label for="companyUniqueId" class="block text-900 font-medium mb-2">Company Unique ID <span
-              class="text-red-500">*</span></label>
-          <input pInputText id="companyUniqueId" type="text" formControlName="companyUniqueId"
-            placeholder="Your registered company ID" class="w-full" [class.p-invalid]="isFieldInvalid('companyUniqueId')" />
-          <small class="p-error block" *ngIf="isFieldInvalid('companyUniqueId')">
-            {{ getFieldError('companyUniqueId') }}
-          </small>
+        <div class="form-row">
+          <!-- Company Unique ID -->
+          <div class="form-group full-width">
+            <label for="companyUniqueId" class="form-label required">Company Unique ID</label>
+            <input
+              id="companyUniqueId"
+              type="text"
+              pInputText
+              formControlName="companyUniqueId"
+              placeholder="Your registered company ID"
+              [class.ng-invalid]="isFieldInvalid('companyUniqueId')"
+              class="form-input"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('companyUniqueId')">
+              {{ getFieldError('companyUniqueId') }}
+            </small>
+          </div>
         </div>
       </div>
 
-      <!-- Terms -->
-      <div class="grid mt-4">
-        <div class="col-12">
-          <div class="flex align-items-center">
-            <p-checkbox formControlName="termsAccepted" inputId="termsAccepted" [binary]="true"
-              [class.p-invalid]="isFieldInvalid('termsAccepted')"></p-checkbox>
-            <label for="termsAccepted" class="ml-2">
+      <!-- ─────────────────────────────────────────────────────────────────────────
+         Terms and Conditions Section
+      ───────────────────────────────────────────────────────────────────────── -->
+      <div class="form-section">
+        <h4 class="section-title">Terms and Conditions</h4>
+
+        <div class="form-group checkbox-section">
+          <div class="checkbox-wrapper">
+            <p-checkbox
+              formControlName="termsAccepted"
+              inputId="termsAccepted"
+              [binary]="true"
+              [class.ng-invalid]="isFieldInvalid('termsAccepted')"
+            ></p-checkbox>
+            <label for="termsAccepted" class="checkbox-label">
               I agree to the
-              <a href="/terms" target="_blank" class="text-primary font-medium">Terms and Conditions</a>
+              <a href="/terms" target="_blank" class="link">Terms and Conditions</a>
               and
-              <a href="/privacy" target="_blank" class="text-primary font-medium">Privacy Policy</a>
-              <span class="text-red-500">*</span>
+              <a href="/privacy" target="_blank" class="link">Privacy Policy</a>
+              <span class="required">*</span>
             </label>
           </div>
-          <small class="p-error block ml-4" *ngIf="isFieldInvalid('termsAccepted')">
+          <small class="error-message" *ngIf="isFieldInvalid('termsAccepted')">
             {{ getFieldError('termsAccepted') }}
           </small>
         </div>
       </div>
 
-      <!-- Submit Button -->
-      <p-button type="submit" label="Create Employer Account" styleClass="w-full mt-4" [loading]="loading"
-        [disabled]="registrationForm.invalid || loading">
-      </p-button>
-
-      <!-- Redirect to Login -->
-      <div class="text-center mt-4">
-        <span class="text-600">Already have an employer account?</span>
-        <a (click)="navigateToLogin()" class="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
+      <!-- ─────────────────────────────────────────────────────────────────────────
+         Form Actions (Submit + Links)
+      ───────────────────────────────────────────────────────────────────────── -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="registrationForm.invalid || loading"
+        >
+          {{ loading ? 'Creating Employer Account...' : 'Create Employer Account' }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="navigateToLogin()"
+        >
           Sign In
-        </a>
+        </button>
       </div>
 
-      <!-- Link to Candidate Registration -->
       <div class="text-center mt-2">
-        <span class="text-600">Want to register as a candidate instead?</span>
-        <a (click)="navigateToCandidateRegistration()" class="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
+        <span class="text-hint">Want to register as a candidate instead?</span>
+        <button
+          type="button"
+          class="btn-link"
+          (click)="navigateToCandidateRegistration()"
+        >
           Register as Candidate
-        </a>
+        </button>
       </div>
     </form>
   </div>
-
-  <!-- Toast Messages -->
-  <!-- <p-toast position="top-right"></p-toast> -->
 </div>
