@@ -254,6 +254,18 @@
         color: #7f8c8d;
         margin: 0;
       }
+      .actions-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 32px; /* Match button height */
+}
     }
   }
 

@@ -12,7 +12,7 @@ import { PasswordUpdateRequest } from '../interfaces/PasswordUpdateRequest';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly API_URL = 'https://zclcl1fq-8080.inc1.devtunnels.ms/api/auth';
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
 

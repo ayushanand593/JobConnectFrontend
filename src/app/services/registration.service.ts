@@ -14,7 +14,7 @@ import { EmployerRegistration } from '../interfaces/EmployerRegistration';
 })
 export class RegistrationService {
 
-private readonly API_URL = 'http://localhost:8080/api';
+private readonly API_URL = 'https://zclcl1fq-8080.inc1.devtunnels.ms/api';
 
   constructor(
     private http: HttpClient,

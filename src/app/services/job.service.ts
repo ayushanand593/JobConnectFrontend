@@ -14,7 +14,7 @@ import { JobCreateDTO } from '../interfaces/JobCreateDTO';
   providedIn: 'root'
 })
 export class JobService {
-private apiUrl = 'http://localhost:8080/api/jobs'; // Adjust base URL as needed
+private apiUrl = 'https://zclcl1fq-8080.inc1.devtunnels.ms/api/jobs'; // Adjust base URL as needed
 
   constructor(private http: HttpClient) {}
 

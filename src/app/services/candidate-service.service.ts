@@ -11,7 +11,7 @@ import { PageResponse } from '../interfaces/PageResponse';
   providedIn: 'root'
 })
 export class CandidateService {
-  private baseUrl = 'http://localhost:8080/api/candidate'; // Adjust based on your API base URL
+  private baseUrl = 'https://zclcl1fq-8080.inc1.devtunnels.ms/api/candidate'; // Adjust based on your API base URL
 
   constructor(private http: HttpClient) {}
 
@@ -54,5 +54,10 @@ export class CandidateService {
       .set('size', size.toString());
     
     return this.http.get<PageResponse<JobApplicationDTO>>(`${this.baseUrl}/my-applications`, { params });
+  }
+
+  // Withdraw Applications
+   withdrawApplication(applicationId: number): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/withdraw/applications/${applicationId}`, {});
   }
 }

@@ -244,91 +244,110 @@
       
       <!-- Applications Tab -->
       <p-tabPanel header="My Applications" leftIcon="pi pi-list">
-        <div class="applications-content">
-          <div class="applications-header">
-            <h3><i class="pi pi-briefcase mr-2"></i>My Job Applications</h3>
-            <p class="applications-subtitle">Track the status of your job applications</p>
-          </div>
-          
-          <p-table [value]="jobApplications" 
-                   [paginator]="true" 
-                   [rows]="pageSize"
-                   [totalRecords]="totalApplications"
-                   [loading]="loadingApplications"
-                   (onPage)="onPageChange($event)"
-                   [lazy]="true"
-                   styleClass="p-datatable-sm custom-table"
-                   responsiveLayout="scroll">
-            <ng-template pTemplate="header">
-              <tr>
-                <th pSortableColumn="createdAt">
-                  Applied Date 
-                  <p-sortIcon field="createdAt"></p-sortIcon>
-                </th>
-                <th>Job Details</th>
-                <th>Status</th>
-                <th>Resume</th>
-                <th>Cover Letter</th>
-                <th>Last Updated</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-application>
-              <tr>
-                <td>
-                  <div class="application-date">
-                    {{application.createdAt | date:'MMM dd, yyyy'}}
-                  </div>
-                </td>
-                 <td>
-                  <div class="job-details">
-                    <div class="job-id">Job Title: {{application.jobName}}</div>
-                  </div>
-                </td>
-                <td>
-                  <p-tag [value]="application.status" 
-                         [severity]="getStatusSeverity(application.status)"
-                         [icon]="getApplicationStatusIcon(application.status)">
-                  </p-tag>
-                </td>
-                <td>
-                  <div class="file-info" *ngIf="application.resumeFileName">
-                    <i class="pi pi-file-pdf mr-2 text-red-500"></i>
-                    <span class="file-name">{{application.resumeFileName}}</span>
-                  </div>
-                  <span class="no-file" *ngIf="!application.resumeFileName">
-                    <i class="pi pi-minus"></i>
-                  </span>
-                </td>
-                <td>
-                  <div class="file-info" *ngIf="application.coverLetterFileName">
-                    <i class="pi pi-file mr-2 text-blue-500"></i>
-                    <span class="file-name">{{application.coverLetterFileName}}</span>
-                  </div>
-                  <span class="no-file" *ngIf="!application.coverLetterFileName">
-                    <i class="pi pi-minus"></i>
-                  </span>
-                </td>
-                <td>
-                  <div class="last-updated">
-                    {{application.updatedAt | date:'MMM dd, yyyy HH:mm'}}
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="6" class="text-center">
-                  <div class="empty-state">
-                    <i class="pi pi-inbox empty-icon"></i>
-                    <p>No job applications found</p>
-                    <small>Start applying to jobs to see them here</small>
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-      </p-tabPanel>
+  <div class="applications-content">
+    <div class="applications-header">
+      <h3><i class="pi pi-briefcase mr-2"></i>My Job Applications</h3>
+      <p class="applications-subtitle">Track the status of your job applications</p>
+    </div>
+    
+    <p-table [value]="jobApplications" 
+             [paginator]="true" 
+             [rows]="pageSize"
+             [totalRecords]="totalApplications"
+             [loading]="loadingApplications"
+             (onPage)="onPageChange($event)"
+             [lazy]="true"
+             styleClass="p-datatable-sm custom-table"
+             responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="createdAt">
+            Applied Date 
+            <p-sortIcon field="createdAt"></p-sortIcon>
+          </th>
+          <th>Job Details</th>
+          <th>Status</th>
+          <th>Resume</th>
+          <th>Cover Letter</th>
+          <th>Last Updated</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-application>
+        <tr>
+          <td>
+            <div class="application-date">
+              {{application.createdAt | date:'MMM dd, yyyy'}}
+            </div>
+          </td>
+           <td>
+            <div class="job-details">
+              <div class="job-id">Job Title: {{application.jobName}}</div>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="application.status" 
+                   [severity]="getStatusSeverity(application.status)"
+                   [icon]="getApplicationStatusIcon(application.status)">
+            </p-tag>
+          </td>
+          <td>
+            <div class="file-info" *ngIf="application.resumeFileName">
+              <i class="pi pi-file-pdf mr-2 text-red-500"></i>
+              <span class="file-name">{{application.resumeFileName}}</span>
+            </div>
+            <span class="no-file" *ngIf="!application.resumeFileName">
+              <i class="pi pi-minus"></i>
+            </span>
+          </td>
+          <td>
+            <div class="file-info" *ngIf="application.coverLetterFileName">
+              <i class="pi pi-file mr-2 text-blue-500"></i>
+              <span class="file-name">{{application.coverLetterFileName}}</span>
+            </div>
+            <span class="no-file" *ngIf="!application.coverLetterFileName">
+              <i class="pi pi-minus"></i>
+            </span>
+          </td>
+          <td>
+            <div class="last-updated">
+              {{application.updatedAt | date:'MMM dd, yyyy HH:mm'}}
+            </div>
+          </td>
+          <td>
+            <div class="actions-cell">
+              <p-button
+                *ngIf="canWithdrawApplication(application.status)"
+                icon="pi pi-times"
+                [loading]="withdrawingApplicationId === application.id"
+                severity="danger"
+                size="small"
+                [outlined]="true"
+                pTooltip="Withdraw Application"
+                tooltipPosition="top"
+                (onClick)="confirmWithdrawApplication(application)">
+              </p-button>
+              <span *ngIf="!canWithdrawApplication(application.status)" class="no-action">
+                <i class="pi pi-lock text-gray-400"></i>
+              </span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-inbox empty-icon"></i>
+              <p>No job applications found</p>
+              <small>Start applying to jobs to see them here</small>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-tabPanel>
 
       <p-tabPanel header="Saved Jobs" leftIcon="pi pi-bookmark-fill" >
         <div class="saved-jobs-container">

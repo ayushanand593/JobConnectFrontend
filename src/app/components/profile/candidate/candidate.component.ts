@@ -62,6 +62,9 @@ export class CandidateComponent {
   fileType: 'pdf' | 'text' | 'word' | 'unsupported' = 'pdf';
   fileContent: string = '';
 
+  // Withdraw Functionality
+    withdrawingApplicationId: number | null = null;
+
   constructor(
     private candidateService: CandidateService,
     private fb: FormBuilder,
@@ -143,26 +146,26 @@ export class CandidateComponent {
     });
   }
 
-  loadJobApplications(page: number = 0): void {
-    this.loadingApplications = true;
-    this.candidateService.getMyApplications(page, this.pageSize).subscribe({
-      next: (response: PageResponse<JobApplicationDTO>) => {
-        console.log(response.content)
-        this.jobApplications = response.content;
-        this.totalApplications = response.totalElements;
-        this.currentPage = response.number;
-        this.loadingApplications = false;
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load job applications'
-        });
-        this.loadingApplications = false;
-      }
-    });
-  }
+loadJobApplications(page: number = 0): void {
+  this.loadingApplications = true;
+  this.candidateService.getMyApplications(page, this.pageSize).subscribe({
+    next: (response: PageResponse<JobApplicationDTO>) => {
+      console.log(response.content);
+      this.jobApplications = response.content;
+      this.totalApplications = response.totalElements;
+      this.currentPage = response.number;
+      this.loadingApplications = false;
+    },
+    error: (error) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load job applications'
+      });
+      this.loadingApplications = false;
+    }
+  });
+}
 
   // Profile management
   openUpdateProfileDialog(): void {
@@ -480,6 +483,64 @@ removeSkill(skill: string): void {
   refreshSavedJobs(): void {
     this.loadSavedJobs();
   }
+
+  // WithDraw Applications Functions
+canWithdrawApplication(status: string): boolean {
+  const withdrawableStatuses = ['PENDING', 'REVIEW', 'SHORTLISTED', 'INTERVIEWED', 'ACCEPTED', 'SUBMITTED'];
+  return withdrawableStatuses.includes(status);
+}
+
+// Method to show confirmation dialog
+confirmWithdrawApplication(application: JobApplicationDTO): void {
+  this.confirmationService.confirm({
+    message: `Are you sure you want to withdraw your application for "${application.jobName}"? This action cannot be undone.`,
+    header: 'Withdraw Application',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Yes, Withdraw',
+    rejectLabel: 'Cancel',
+    accept: () => {
+      this.withdrawApplication(application.id, application.jobName);
+    }
+  });
+}
+
+// Method to withdraw application
+withdrawApplication(applicationId: number, jobName: string): void {
+  this.withdrawingApplicationId = applicationId;
+  
+  this.candidateService.withdrawApplication(applicationId).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: `Application for "${jobName}" has been withdrawn successfully`
+      });
+      
+      // Refresh the current page to show updated status
+      this.loadJobApplications(this.currentPage);
+      this.withdrawingApplicationId = null;
+    },
+    error: (error) => {
+      console.error('Error withdrawing application:', error);
+      let errorMessage = 'Failed to withdraw application';
+      
+      if (error.error?.message) {
+        errorMessage = error.error.message;
+      } else if (error.status === 403) {
+        errorMessage = 'You do not have permission to withdraw this application';
+      } else if (error.status === 404) {
+        errorMessage = 'Application not found';
+      }
+      
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: errorMessage
+      });
+      this.withdrawingApplicationId = null;
+    }
+  });
+}
 
   // Navigation
   navigateToHome(){

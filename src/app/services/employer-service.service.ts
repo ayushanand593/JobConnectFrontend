@@ -13,7 +13,7 @@ import { JobStatus } from '../interfaces/JobStatus';
   providedIn: 'root'
 })
 export class EmployerService {
-private baseUrl = 'http://localhost:8080/api/employer';
+private baseUrl = 'https://zclcl1fq-8080.inc1.devtunnels.ms/api/employer';
 
 constructor(private http: HttpClient) {}
 
@@ -56,10 +56,10 @@ updateJobStatus(jobId:string, status:JobStatus):Observable<void>{
 }
 
   downloadResume(fileId: string): Observable<Blob> {
-    return this.http.get(`http://localhost:8080/api/files/${fileId}`, { responseType: 'blob' });
+    return this.http.get(`https://zclcl1fq-8080.inc1.devtunnels.ms/api/files/${fileId}`, { responseType: 'blob' });
   }
 
   downloadCoverLetter(fileId: string): Observable<Blob> {
-    return this.http.get(`http://localhost:8080/api/files/${fileId}`, { responseType: 'blob' });
+    return this.http.get(`https://zclcl1fq-8080.inc1.devtunnels.ms/api/files/${fileId}`, { responseType: 'blob' });
   }
 }

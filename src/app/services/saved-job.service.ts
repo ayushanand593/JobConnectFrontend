@@ -10,7 +10,7 @@ import { AuthService } from './auth-service.service';
 })
 export class SavedJobService {
 
-  private readonly API_URL = 'http://localhost:8080/api/saved-jobs';
+  private readonly API_URL = 'https://zclcl1fq-8080.inc1.devtunnels.ms/api/saved-jobs';
   private savedJobsSubject = new BehaviorSubject<Job[]>([]);
   public savedJobs$ = this.savedJobsSubject.asObservable();
   
