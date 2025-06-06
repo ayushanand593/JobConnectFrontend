@@ -29,15 +29,19 @@ export class JobDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.jobId = params['jobId'];
-      if (this.jobId) {
-        this.loadJobDetails();
-      }
-    });
-     this.savedJobService.refreshSavedJobs();
-     this.role=this.authService.hasRole("CANDIDATE");
+  this.route.params.subscribe(params => {
+    this.jobId = params['jobId'];
+    if (this.jobId) {
+      this.loadJobDetails();
+    }
+  });
+  
+  this.role = this.authService.hasRole("CANDIDATE");
+  // Only refresh saved jobs if user is a candidate
+  if (this.role) {
+    this.savedJobService.refreshSavedJobs();
   }
+}
 
   loadJobDetails(): void {
     this.loading = true;

@@ -48,6 +48,7 @@ export class JobListComponent implements OnInit {
 
   ngOnInit(): void {
     // Check if there are search parameters in URL
+    this.role=this.authService.hasRole("CANDIDATE");
     this.route.queryParams.subscribe(params => {
       if (Object.keys(params).length > 0) {
         this.isSearchMode = true;
@@ -57,8 +58,10 @@ export class JobListComponent implements OnInit {
         this.loadAllJobs();
       }
     });
+    if (this.role) {
     this.savedJobService.refreshSavedJobs();
-  this.role=this.authService.hasRole("CANDIDATE");
+  }
+  
   }
 
   // Handle search performed from the JobSearchComponent
