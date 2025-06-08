@@ -314,6 +314,7 @@ ngOnInit() {
     this.jobsLoading = true;
     this.employerService.getMyJobs().subscribe({
       next: (jobs) => {
+        console.log(jobs)
         this.jobs = jobs.sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });

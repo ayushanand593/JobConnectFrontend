@@ -276,6 +276,8 @@
           justify-content: center;
           font-size: 1.8rem;
           color: white;
+          flex-shrink: 0;              // Prevent squishing
+  aspect-ratio: 1 / 1; 
 
           &.jobs { 
             background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
@@ -962,6 +964,7 @@
     font-size: 1.05rem;
     transition: all 0.3s ease;
     background: white;
+    margin-bottom: 1rem;
 
     &:focus {
       outline: none;
