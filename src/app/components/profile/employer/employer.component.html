@@ -381,7 +381,7 @@
     (onClick)="downloadResume(application)">
   </p-button>
 
-             <div *ngIf="application.coverLetterFileId" class="flex gap-2">
+             <div *ngIf="application.coverLetterFileId" class="file-downloads">
   <p-button 
     icon="pi pi-eye" 
     label="View Cover Letter" 
@@ -407,6 +407,12 @@
           </div>
 
           <div class="application-actions">
+            <p-button 
+    label="View Application" 
+    icon="pi pi-eye"
+    class="p-button-sm p-button-outlined p-button-info"
+    (onClick)="viewApplication(application)">
+  </p-button>
             <p-button 
               *ngIf="application.status === 'SUBMITTED'"
               label="Review" 
@@ -731,3 +737,133 @@
 <p-dialog header="{{ dialogTitle }}" [(visible)]="displayFileDialog" [modal]="true" [maximizable]="true" [style]="{'width': '80vw'}" [baseZIndex]="10000">
   <iframe *ngIf="dialogFileUrl" [src]="dialogFileUrl" width="100%" height="600px" frameborder="0"></iframe>
 </p-dialog>
+
+<p-dialog 
+  [(visible)]="editJobDialog" 
+  [style]="{width: '80vw'}" 
+  [modal]="true" 
+  [draggable]="false" 
+  [resizable]="false"
+  header="Edit Job"
+  styleClass="edit-job-dialog" >
+  
+  <form [formGroup]="editJobForm" *ngIf="editJobDialog">
+    <!-- Job Title -->
+    <div class="field">
+      <label for="title">Job Title*</label>
+      <input id="title" type="text" pInputText formControlName="title" class="w-full">
+      <small class="p-error" *ngIf="isFieldInvalid('title')">{{getFieldError('title')}}</small>
+    </div>
+
+    <!-- Location -->
+    <div class="field">
+      <label for="location">Location*</label>
+      <input id="location" type="text" pInputText formControlName="location" class="w-full">
+      <small class="p-error" *ngIf="isFieldInvalid('location')">{{getFieldError('location')}}</small>
+    </div>
+
+    <!-- Job Type -->
+    <div class="field">
+      <label for="jobType">Job Type*</label>
+      <p-dropdown id="jobType" [options]="jobTypes" formControlName="jobType" 
+                 optionLabel="label" optionValue="value" [style]="{'width':'100%'}">
+      </p-dropdown>
+      <small class="p-error" *ngIf="isFieldInvalid('jobType')">{{getFieldError('jobType')}}</small>
+    </div>
+
+    <!-- Experience Level -->
+    <div class="field">
+      <label for="experienceLevel">Experience Level</label>
+      <p-dropdown id="experienceLevel" [options]="experienceLevels" formControlName="experienceLevel"
+                 optionLabel="label" optionValue="value" [style]="{'width':'100%'}">
+      </p-dropdown>
+    </div>
+
+    <!-- Skills -->
+ <div class="field">
+  <label>Required Skills</label>
+  <div class="selected-skills">
+    <div class="skills-list">
+      <span 
+        *ngFor="let skill of selectedSkills; let i = index" 
+        class="skill-chip"
+        (click)="removeSkillByIndex(i)">
+        {{skill}} <i class="pi pi-times"></i>
+      </span>
+    </div>
+    <input 
+      type="text" 
+      pInputText 
+      placeholder="Add skill and press Enter"
+      (keydown.enter)="addSkillFromInput($event)"
+      class="skill-input">
+  </div>
+</div>
+
+
+    <!-- Other fields (description, requirements, etc.) -->
+    <div class="field">
+      <label for="description">Description*</label>
+      <textarea id="description" pInputTextarea formControlName="description" 
+                [rows]="5" class="w-full"></textarea>
+      <small class="p-error" *ngIf="isFieldInvalid('description')">{{getFieldError('description')}}</small>
+    </div>
+
+    <!-- Requirements -->
+<div class="field">
+  <label for="requirements">Requirements</label>
+  <textarea 
+    id="requirements" 
+    pInputTextarea 
+    formControlName="requirements" 
+    [rows]="4" 
+    class="w-full">
+  </textarea>
+  <small class="p-error" *ngIf="isFieldInvalid('requirements')">{{getFieldError('requirements')}}</small>
+</div>
+
+<!-- Responsibilities -->
+<div class="field">
+  <label for="responsibilities">Responsibilities</label>
+  <textarea 
+    id="responsibilities" 
+    pInputTextarea 
+    formControlName="responsibilities" 
+    [rows]="4" 
+    class="w-full">
+  </textarea>
+  <small class="p-error" *ngIf="isFieldInvalid('responsibilities')">{{getFieldError('responsibilities')}}</small>
+</div>
+
+<!-- Application Deadline -->
+<div class="field">
+  <label for="applicationDeadline">Application Deadline</label>
+  <p-calendar 
+    id="applicationDeadline"
+    formControlName="applicationDeadline"
+    [minDate]="minDate"
+    [showTime]="false"
+    dateFormat="yy-mm-dd"
+    placeholder="Select a deadline">
+  </p-calendar>
+</div>
+
+    <!-- Add other form fields as needed -->
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" (onClick)="closeEditDialog()" 
+              label="Cancel" styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-check" (onClick)="saveJobChanges()" 
+              label="Save Changes" [loading]="loading"></p-button>
+  </ng-template>
+</p-dialog>
+<app-view-application
+  [(visible)]="showViewApplicationDialog"
+  [application]="selectedApplication"
+  [showStatusActions]="true"
+  (viewResume)="viewResume($event)"
+  (downloadResume)="downloadResume($event)"
+  (viewCoverLetter)="viewCoverLetter($event)"
+  (downloadCoverLetter)="downloadCoverLetter($event)">
+</app-view-application>

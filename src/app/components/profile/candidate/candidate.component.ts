@@ -14,6 +14,8 @@ import { PageResponse } from 'src/app/interfaces/PageResponse';
 import { CandidateService } from 'src/app/services/candidate-service.service';
 import { SavedJobService } from 'src/app/services/saved-job.service';
 import { EmployerService } from 'src/app/services/employer-service.service';
+import { JobApplication } from 'src/app/interfaces/JobApplication';
+import { JobApplicationService } from 'src/app/services/job-application.service';
 
 @Component({
   selector: 'app-candidate',
@@ -65,8 +67,14 @@ export class CandidateComponent {
   // Withdraw Functionality
     withdrawingApplicationId: number | null = null;
 
+    // View Application
+     showViewApplicationDialog = false;
+  selectedApplication: JobApplication | null = null;
+
+
   constructor(
     private candidateService: CandidateService,
+    private jobApplicationService:JobApplicationService,
     private fb: FormBuilder,
     private messageService: MessageService,
     private savedJobsService: SavedJobService,
@@ -542,6 +550,36 @@ withdrawApplication(applicationId: number, jobName: string): void {
   });
 }
 
+// Method to view application details
+ /**
+   * Open the view application dialog
+   */
+  viewApplication(application: JobApplication): void {
+    // Fetch complete application details
+    this.jobApplicationService.getJobApplication(application.id).subscribe({
+      next: (fullApplication) => {
+        this.selectedApplication = fullApplication;
+        this.showViewApplicationDialog = true;
+      },
+      error: (error) => {
+        console.error('Error fetching application details:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load application details'
+        });
+      }
+    });
+  }
+
+  /**
+   * Close the view application dialog
+   */
+  closeViewApplicationDialog(): void {
+    this.showViewApplicationDialog = false;
+    this.selectedApplication = null;
+  }
+
   // Navigation
   navigateToHome(){
     this.router.navigate(['/']);
@@ -591,30 +629,147 @@ withdrawApplication(applicationId: number, jobName: string): void {
       }
     });
   }
-   // Function to view resume
-  viewResume(): void {
-    if (this.candidateProfile && this.candidateProfile.resumeFileId) {
-      this.employerService.downloadResume(this.candidateProfile.resumeFileId).subscribe({
-        next: (blob: Blob) => {
-          const fileName = this.candidateProfile?.resumeFileName || 'resume';
-          this.openFileDialog('Resume', blob, fileName);
-        },
-        error: (error: any) => {
-          console.error('Error loading resume:', error);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load resume'
-          });
-        }
-      });
-    } else {
+  // Update the viewResume method to handle both cases
+viewResume(applicationOrId?: JobApplication | any): void {
+  // If called from view-application component (with application object)
+  if (applicationOrId && applicationOrId.resumeFileId) {
+    this.employerService.downloadResume(applicationOrId.resumeFileId).subscribe({
+      next: (blob: Blob) => {
+        const fileName = applicationOrId.resumeFileName || 'resume';
+        this.openFileDialog('Resume', blob, fileName);
+      },
+      error: (error: any) => {
+        console.error('Error loading resume:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load resume'
+        });
+      }
+    });
+  } 
+  // If called from profile view (no parameters)
+  else if (this.candidateProfile && this.candidateProfile.resumeFileId) {
+    this.employerService.downloadResume(this.candidateProfile.resumeFileId).subscribe({
+      next: (blob: Blob) => {
+        const fileName = this.candidateProfile?.resumeFileName || 'resume';
+        this.openFileDialog('Resume', blob, fileName);
+      },
+      error: (error: any) => {
+        console.error('Error loading resume:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load resume'
+        });
+      }
+    });
+  } else {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'No Resume',
+      detail: 'No resume available to view'
+    });
+  }
+}
+
+    /**
+   * Download resume file
+   */
+  downloadResume(application: JobApplication): void {
+    if (!application.resumeFileId) {
       this.messageService.add({
         severity: 'warn',
-        summary: 'No Resume',
-        detail: 'You have not uploaded a resume yet.'
+        summary: 'Warning',
+        detail: 'No resume file available'
       });
+      return;
     }
+
+    this.jobApplicationService.downloadResumeFile(application.resumeFileId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = application.resumeFileName || 'resume.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error downloading resume:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to download resume'
+        });
+      }
+    });
+  }
+
+  /**
+   * View cover letter file
+   */
+  viewCoverLetter(application: JobApplication): void {
+    if (!application.coverLetterFileId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'No cover letter file available'
+      });
+      return;
+    }
+
+    this.jobApplicationService.viewCoverLetterFile(application.coverLetterFileId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      },
+      error: (error) => {
+        console.error('Error viewing cover letter:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to view cover letter'
+        });
+      }
+    });
+  }
+
+  /**
+   * Download cover letter file
+   */
+  downloadCoverLetter(application: JobApplication): void {
+    if (!application.coverLetterFileId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'No cover letter file available'
+      });
+      return;
+    }
+
+    this.jobApplicationService.downloadCoverLetterFile(application.coverLetterFileId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = application.coverLetterFileName || 'cover-letter.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error downloading cover letter:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to download cover letter'
+        });
+      }
+    });
   }
 
   // Opens the preview dialog

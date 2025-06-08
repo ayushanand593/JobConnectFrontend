@@ -1,0 +1,216 @@
+ <p-dialog 
+      [(visible)]="visible" 
+      [modal]="true" 
+      [closable]="true"
+      [draggable]="false"
+      [resizable]="false"
+      styleClass="view-application-dialog"
+      header="Application Details"
+      [style]="{width: '90vw', maxWidth: '1000px', height: '90vh'}"
+      (onHide)="onClose()">
+      
+      <div class="application-dialog-content" *ngIf="application">
+        
+        <!-- Header Section -->
+        <div class="application-header">
+          <div class="candidate-overview">
+            <div class="candidate-main-info">
+              <h2 class="candidate-name">
+                <i class="pi pi-user mr-2"></i>
+                {{ application.candidateName }}
+              </h2>
+              <p class="candidate-headline" *ngIf="application.headline">
+                {{ application.headline }}
+              </p>
+            </div>
+            <div class="application-status">
+              <p-tag 
+                [value]="application.status" 
+                [severity]="getStatusSeverity(application.status)"
+                class="status-tag">
+              </p-tag>
+            </div>
+          </div>
+          
+          <div class="job-info">
+            <h3 class="job-title">
+              <i class="pi pi-briefcase mr-2"></i>
+              {{ application.jobName }}
+            </h3>
+            <p class="company-name">
+              <i class="pi pi-building mr-2"></i>
+              {{ application.companyName }}
+            </p>
+          </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <!-- Main Content Tabs -->
+        <p-tabView>
+          
+          <!-- Candidate Profile Tab -->
+          <p-tabPanel header="Candidate Profile" leftIcon="pi pi-user">
+            <div class="profile-section">
+              
+              <div class="profile-grid">
+                <div class="profile-item" *ngIf="application.experienceYears">
+                  <label class="profile-label">
+                    <i class="pi pi-briefcase mr-2"></i>
+                    Experience
+                  </label>
+                  <div class="profile-value">{{ application.experienceYears }} years</div>
+                </div>
+
+                <div class="profile-item" *ngIf="hasSkills(application.skills)">
+                  <label class="profile-label">
+                    <i class="pi pi-cog mr-2"></i>
+                    Skills
+                  </label>
+                  <div class="skills-display">
+                    <p-chip 
+                      *ngFor="let skill of getSkillsArray(application.skills)" 
+                      [label]="skill"
+                      class="skill-chip">
+                    </p-chip>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-info">
+                <div class="timeline-item">
+                  <i class="pi pi-calendar timeline-icon"></i>
+                  <div class="timeline-content">
+                    <label>Applied On</label>
+                    <span>{{ formatDateTime(application.createdAt) }}</span>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <i class="pi pi-clock timeline-icon"></i>
+                  <div class="timeline-content">
+                    <label>Last Updated</label>
+                    <span>{{ formatDateTime(application.updatedAt) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- Documents Tab -->
+          <p-tabPanel header="Documents" leftIcon="pi pi-file">
+            <div class="documents-section">
+              
+              <!-- Resume Section -->
+              <div class="document-card" *ngIf="application.resumeFileId">
+                <div class="document-header">
+                  <div class="document-info">
+                    <i class="pi pi-file-pdf document-icon resume-icon"></i>
+                    <div class="document-details">
+                      <h4>Resume</h4>
+                      <span class="file-name">{{ application.resumeFileName }}</span>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <p-button 
+                      icon="pi pi-eye" 
+                      label="View" 
+                      class="p-button-sm p-button-outlined p-button-primary"
+                      (click)="viewResume.emit(application)">
+                    </p-button>
+                    <p-button 
+                      icon="pi pi-download" 
+                      label="Download" 
+                      class="p-button-sm p-button-outlined p-button-secondary"
+                      (click)="downloadResume.emit(application)">
+                    </p-button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cover Letter Section -->
+              <div class="document-card" *ngIf="application.coverLetterFileId">
+                <div class="document-header">
+                  <div class="document-info">
+                    <i class="pi pi-file document-icon cover-letter-icon"></i>
+                    <div class="document-details">
+                      <h4>Cover Letter</h4>
+                      <span class="file-name">{{ application.coverLetterFileName }}</span>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <p-button 
+                      icon="pi pi-eye" 
+                      label="View" 
+                      class="p-button-sm p-button-outlined p-button-primary"
+                      (click)="viewCoverLetter.emit(application)">
+                    </p-button>
+                    <p-button 
+                      icon="pi pi-download" 
+                      label="Download" 
+                      class="p-button-sm p-button-outlined p-button-secondary"
+                      (click)="downloadCoverLetter.emit(application)">
+                    </p-button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- No Documents Message -->
+              <div *ngIf="!application.resumeFileId && !application.coverLetterFileId" class="no-documents">
+                <i class="pi pi-file-o empty-icon"></i>
+                <p>No documents attached to this application</p>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- Disclosure Answers Tab -->
+          <p-tabPanel 
+            header="Disclosures" 
+            leftIcon="pi pi-question-circle"
+            *ngIf="application.disclosureAnswers?.length">
+            <div class="disclosures-section">
+              <div class="disclosure-item" *ngFor="let answer of application.disclosureAnswers">
+                <div class="disclosure-question">
+                  <i class="pi pi-question-circle mr-2"></i>
+                  <strong>{{ answer.questionText }}</strong>
+                </div>
+                <div class="disclosure-answer">
+                  <p>{{ answer.answerText }}</p>
+                </div>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- Additional Info Tab -->
+          <p-tabPanel 
+            header="Additional Info" 
+            leftIcon="pi pi-info-circle"
+            *ngIf="application.voluntaryDisclosures">
+            <div class="additional-info-section">
+              <div class="info-card">
+                <h4>
+                  <i class="pi pi-info-circle mr-2"></i>
+                  Voluntary Disclosures
+                </h4>
+                <p class="disclosure-text">{{ application.voluntaryDisclosures }}</p>
+              </div>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
+
+      <!-- Dialog Footer -->
+      <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+          <div class="footer-actions">
+            
+            <!-- Close button -->
+            <p-button 
+              label="Close" 
+              icon="pi pi-times"
+              class="p-button-sm p-button-text"
+              (click)="onClose()">
+            </p-button>
+          </div>
+        </div>
+      </ng-template>
+    </p-dialog>

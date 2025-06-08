@@ -470,7 +470,9 @@
         }
       }
     }
+   
   }
+  
 
   // ===== APPLICATIONS TAB STYLES =====
   .applications-tab {
@@ -651,18 +653,40 @@
             }
 
             .skills-container {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 
-              .skill-chip {
-                color: #4f46e5;
-                border-radius: 20px;
-                font-weight: 500;
-                font-size: 0.95rem;
-                box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
-              }
-            }
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .skill-tag {
+      background: #e9ecef;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+
+      &:hover {
+        background: #dee2e6;
+      }
+
+      .pi-times {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  .skill-input {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
           }
         }
 
@@ -862,6 +886,53 @@
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+     .selected-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.2rem;
+        padding: 0.8rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        min-height: 60px;
+        align-items: center;
+        border: 1px dashed #cbd5e0;
+        
+    .skill-chip {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 20px;
+          padding: 0.5rem 1.2rem;
+          font-size: 0.95rem;
+          font-weight: 500;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.8rem;
+          box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+
+          .remove-skill {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.3);
+              transform: scale(1.1);
+            }
+          
+        }
+        }
+
+        
+      }
 
     &.full-width {
       grid-column: 1 / -1;
@@ -955,59 +1026,7 @@
   }
 
   // Skills Section
-  .selected-skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-bottom: 1.2rem;
-    padding: 0.8rem;
-    background: #f8f9fa;
-    border-radius: 10px;
-    min-height: 60px;
-    align-items: center;
-    border: 1px dashed #cbd5e0;
-
-    .skill-chip {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 20px;
-      padding: 0.5rem 1.2rem;
-      font-size: 0.95rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.8rem;
-      box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
-      transition: all 0.3s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-      }
-
-      .remove-skill {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        cursor: pointer;
-        font-size: 1.1rem;
-        font-weight: bold;
-        padding: 0;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.3);
-          transform: scale(1.1);
-        }
-      }
-    }
-  }
+ 
 
   // Disclosure Questions
   .disclosure-question-item {
@@ -1191,5 +1210,220 @@
     &:nth-child(2) { animation-delay: 0.2s; }
     &:nth-child(3) { animation-delay: 0.3s; }
     &:nth-child(4) { animation-delay: 0.4s; }
+  }
+}
+
+ ::ng-deep .edit-job-dialog {
+  // Dialog Header
+  ::ng-deep .p-dialog-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 12px 12px 0 0;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .p-dialog-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .p-dialog-header-icon {
+      color: white;
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+
+  // Dialog Content
+  ::ng-deep .p-dialog-content {
+    padding: 2rem;
+
+    // Form Layout
+    .form-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.8rem;
+      margin-bottom: 1.8rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e1e8ed;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+    }
+
+    // Field Styles
+    .field {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 1.05rem;
+        margin-bottom: 0.8rem;
+
+        &::after {
+          content: ' *';
+          color: #e74c3c;
+          font-weight: bold;
+        }
+      }
+
+      input, textarea {
+        width: 100%;
+        padding: 0.9rem 1.2rem;
+        border: 2px solid #e1e8ed;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        background: white;
+
+        &:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          transform: translateY(-1px);
+        }
+
+        &.ng-invalid.ng-touched {
+          border-color: #e74c3c;
+          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      // Skills Section
+      .selected-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.2rem;
+        padding: 0.8rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        min-height: 60px;
+        align-items: center;
+        border: 1px dashed #cbd5e0;
+        .skills-list{
+          display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 0.5rem;
+    .skill-chip {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 20px;
+          padding: 0.5rem 1.2rem;
+          font-size: 0.95rem;
+          font-weight: 500;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.8rem;
+          box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+
+          .remove-skill {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.3);
+              transform: scale(1.1);
+            }
+          }
+        }
+        }
+
+        
+      }
+       
+
+      // Error Messages
+      .p-error {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &::before {
+          content: '⚠';
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  // Dialog Footer
+  ::ng-deep .p-dialog-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e1e8ed;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    .p-button {
+      padding: 0.8rem 1.8rem;
+      font-weight: 600;
+
+      &.p-button-secondary {
+        background: white;
+        color: #718096;
+        border: 2px solid #e1e8ed;
+
+        &:hover {
+          background: #f8f9fa;
+          border-color: #667eea;
+          color: #667eea;
+        }
+      }
+
+      &.p-button-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+      }
+    }
   }
 }

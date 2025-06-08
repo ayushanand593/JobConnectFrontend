@@ -50,6 +50,10 @@ private apiUrl = 'https://zclcl1fq-8080.inc1.devtunnels.ms/api/jobs'; // Adjust 
     return this.http.post<Job>(`${this.apiUrl}/create-job`, jobData);
   }
 
+  updateJob(jobId: string, jobData: JobCreateDTO): Observable<Job> {
+    return this.http.put<Job>(`${this.apiUrl}/jobId/${jobId}`, jobData);
+  }
+
   applyToJob(
     jobId: string, 
     applicationData: JobApplicationSubmissionDTO,

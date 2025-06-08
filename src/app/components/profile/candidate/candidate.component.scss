@@ -4,7 +4,10 @@
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
-
+.mr-2{
+     margin-right: 0.5rem;
+    font-size: x-large;
+}
   .card {
     background: #ffffff;
     border-radius: 12px;
@@ -25,6 +28,7 @@
       
       .pi {
         color: #3498db;
+   
       }
     }
 
@@ -76,57 +80,77 @@
   }
 
   // Dashboard Stats Cards
-  .stat-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    padding: 1.5rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.stat-card {
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  &.total-applications {
+    // Soft blue-gray neutral
+    background: linear-gradient(
+      135deg,
+      #4f86f7 0%,
+      #8faaf8 100%
+    );
+  }
+
+  &.pending-applications {
+    // Warm warning amber → orange
+    background: linear-gradient(
+      135deg,
+      #f6d365 0%,
+      #fda085 100%
+    );
+  }
+
+  &.reviewed-applications {
+    // Cool info teal → cyan
+    background: linear-gradient(
+      135deg,
+      #4fd1c5 0%,
+      #4299e1 100%
+    );
+  }
+
+  &.accepted-applications {
+    // Vibrant success green → emerald
+    background: linear-gradient(
+      135deg,
+      #48bb78 0%,
+      #38a169 100%
+    );
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+    margin-right: 1rem;
+    opacity: 0.85;
+  }
+
+  .stat-content {
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
     }
 
-    &.total-applications {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    &.pending-applications {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    &.reviewed-applications {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-
-    &.accepted-applications {
-      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    }
-
-    .stat-icon {
-      font-size: 2.5rem;
-      margin-right: 1rem;
-      opacity: 0.8;
-    }
-
-    .stat-content {
-      .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.25rem;
-      }
-
-      .stat-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        font-weight: 500;
-      }
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      font-weight: 500;
     }
   }
+}
+
 
   // Recent Applications Section
   .recent-applications-section {
@@ -254,11 +278,6 @@
         color: #7f8c8d;
         margin: 0;
       }
-      .actions-cell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
 .no-action {
   display: flex;
@@ -340,8 +359,17 @@
     .no-file {
       color: #bdc3c7;
     }
-  }
+ 
 
+  }
+         .actions-cell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .mr-2{
+        margin-right: 0.5rem;
+  }
+}
   // Empty State
   .empty-state {
     padding: 3rem 1rem;
@@ -859,8 +887,12 @@
 
     .dashboard-header h2 {
       font-size: 1.5rem;
+          display: flex;
+    align-items: center;
+    justify-content: center;
+       
     }
-
+ 
     .stat-card {
       padding: 1rem;
       

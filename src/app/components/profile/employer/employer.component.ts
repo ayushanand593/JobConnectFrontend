@@ -57,6 +57,12 @@ jobForm: FormGroup;
   availableSkills: string[] = [];
   isCreatingJob:boolean=false;
 
+  // Update job functionality
+  editJobDialog: boolean = false;
+editJobForm!: FormGroup;
+currentEditingJobId: string | null = null;
+loading:boolean=false;
+
 // filteredSkills: string[] = [];
 selectedSkills: string[] = [];
 skillInput: string = '';
@@ -75,11 +81,16 @@ dialogFileUrl: SafeResourceUrl | null = null;
 fileType: 'pdf' | 'text' | 'word' | 'unsupported' = 'pdf';
 fileContent: string = '';
 
+// View Application Dialog properties
+  showViewApplicationDialog = false;
+  selectedApplication: JobApplication | null = null;
+
   statusOptions = [
     { label: 'All Status', value: null },
-    { label: 'Submitted', value: ApplicationStatus.SUBMITTED },
     { label: 'Reviewed', value: ApplicationStatus.REVIEW },
     { label: 'Shortlisted', value: ApplicationStatus.SHORTLISTED },
+    { label: 'Withdrawn', value: ApplicationStatus.WITHDRAWN },
+    { label: 'Accepted', value: ApplicationStatus.ACCEPTED },
     { label: 'Rejected', value: ApplicationStatus.REJECTED }
   ];
   // Add these properties to your component class
@@ -119,13 +130,13 @@ jobStatusOptions = [
     applicationDeadline: [''],
     disclosureQuestions: this.fb.array([])
   });
-
+    
     // Default date range to last 30 days
-    const endDate = new Date();
-    const startDate = new Date();
+ const endDate: Date = new Date();
+  const startDate: Date = new Date();
     startDate.setDate(startDate.getDate() - 30);
     this.dateRange = [startDate, endDate];
-     this.initializeJobForm();
+   this.initializeJobForm();
   }
 
 ngOnInit() {
@@ -340,9 +351,142 @@ ngOnInit() {
   });
 }
 
-  editJob(jobId: string) {
-    this.router.navigate(['/employer/jobs/edit', jobId]);
+ editJob(jobId: string): void {
+  this.currentEditingJobId = jobId;
+  this.loading = true;
+  
+  this.jobService.getJobByJobId(jobId).subscribe({
+    next: (job) => {
+      // Initialize edit form if not already done
+      if (!this.editJobForm) {
+        this.initializeEditForm();
+      }
+      
+      this.populateEditForm(job);
+      this.editJobDialog = true;
+      this.loading = false;
+    },
+    error: (error) => {
+      console.error('Error fetching job details:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load job details'
+      });
+      this.loading = false;
+    }
+  });
+}
+
+private populateEditForm(job: Job): void {
+  // Clear existing disclosure questions
+  const disclosureQuestionsArray = this.editJobForm.get('disclosureQuestions') as FormArray;
+  disclosureQuestionsArray.clear();
+
+  // Set basic form values
+  this.editJobForm.patchValue({
+    title: job.title,
+    location: job.location,
+    jobType: job.jobType,
+    experienceLevel: job.experienceLevel,
+    description: job.description,
+    requirements: job.requirements || '',
+    responsibilities: job.responsibilities || '',
+    salaryRange: job.salaryRange || '',
+    applicationDeadline: job.applicationDeadline ? new Date(job.applicationDeadline) : null
+  });
+
+  // Set skills
+  this.selectedSkills = job.skills ? job.skills.map(skill => skill.name) : [];
+  this.editJobForm.patchValue({ skills: this.selectedSkills });
+
+  // Add disclosure questions if they exist
+  if (job.disclosureQuestions?.length > 0) {
+    job.disclosureQuestions.forEach(question => {
+      const questionForm = this.fb.group({
+        questionText: [question.questionText, [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+        isRequired: [question.isRequired]
+      });
+      disclosureQuestionsArray.push(questionForm);
+    });
   }
+}
+
+private initializeEditForm(): void {
+  this.editJobForm = this.fb.group({
+    title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+    location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+    jobType: ['', Validators.required],
+    experienceLevel: [''],
+    description: ['', [Validators.required, Validators.minLength(50), Validators.maxLength(5000)]],
+    requirements: ['', [Validators.maxLength(5000)]],
+    responsibilities: ['', [Validators.maxLength(5000)]],
+    salaryRange: ['', [Validators.maxLength(50)]],
+    skills: [[]],
+    applicationDeadline: [''],
+    disclosureQuestions: this.fb.array([])
+  });
+}
+
+saveJobChanges(): void {
+  if (this.editJobForm.valid && this.currentEditingJobId) {
+    this.loading = true;
+    
+    const formValue = this.editJobForm.value;
+    const jobUpdateData: JobCreateDTO = {
+      title: formValue.title,
+      location: formValue.location,
+      jobType: formValue.jobType,
+      experienceLevel: formValue.experienceLevel,
+      description: formValue.description,
+      requirements: formValue.requirements || undefined,
+      responsibilities: formValue.responsibilities || undefined,
+      salaryRange: formValue.salaryRange || undefined,
+      skills: this.selectedSkills,
+      applicationDeadline: formValue.applicationDeadline ? 
+        new Date(formValue.applicationDeadline).toISOString().split('T')[0] : undefined,
+      disclosureQuestions: formValue.disclosureQuestions.map((q: any) => ({
+        questionText: q.questionText,
+        isRequired: q.isRequired
+      }))
+    };
+
+    this.jobService.updateJob(this.currentEditingJobId, jobUpdateData).subscribe({
+      next: (updatedJob) => {
+        // Update the job in the local array
+        const index = this.jobs.findIndex(job => job.jobId === this.currentEditingJobId);
+        if (index !== -1) {
+          this.jobs[index] = updatedJob;
+        }
+        
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Job updated successfully'
+        });
+        
+        this.closeEditDialog();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error updating job:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error?.message || 'Failed to update job'
+        });
+        this.loading = false;
+      }
+    });
+  }
+}
+
+closeEditDialog(): void {
+  this.editJobDialog = false;
+  this.currentEditingJobId = null;
+  this.selectedSkills = [];
+  this.editJobForm.reset();
+}
 
   // ===== APPLICATIONS TAB METHODS =====
   loadApplications() {
@@ -623,6 +767,11 @@ viewCoverLetter(application: JobApplication) {
 openFileDialog(title: string, blob: Blob, fileName: string): void {
   this.dialogTitle = title;
   this.fileType = this.getFileType(fileName, blob.type);
+
+   if (this.fileType === 'word') {
+    this.handleWordFile(blob, fileName);
+    return; // Don't open dialog for Word files
+  }
   
   switch (this.fileType) {
     case 'pdf':
@@ -633,10 +782,6 @@ openFileDialog(title: string, blob: Blob, fileName: string): void {
       
     case 'text':
       this.readTextFile(blob);
-      break;
-      
-    case 'word':
-      this.handleWordFile(blob, fileName);
       break;
       
     case 'unsupported':
@@ -686,6 +831,7 @@ handleWordFile(blob: Blob, fileName: string): void {
     summary: 'Word Document',
     detail: 'Word documents cannot be previewed directly. Please download to view the full content.'
   });
+   this.displayFileDialog = false;
   
   // Optionally, you could integrate mammoth.js here to convert docx to HTML
   // But it requires additional library installation
@@ -831,6 +977,23 @@ onSkillInput(event: any): void {
   // Also update the FormControl value
   this.skillInputControl.setValue(this.skillInput, { emitEvent: false });
 }
+addSkillFromInput(event: any): void {
+  const input = event.target;
+  const value = input.value.trim();
+  
+  if (value && !this.selectedSkills.includes(value)) {
+    const formattedSkill = this.formatSkill(value);
+    this.selectedSkills.push(formattedSkill);
+    this.editJobForm.patchValue({ skills: this.selectedSkills });
+    input.value = '';
+  }
+  event.preventDefault();
+}
+
+removeSkillByIndex(index: number): void {
+  this.selectedSkills.splice(index, 1);
+  this.editJobForm.patchValue({ skills: this.selectedSkills });
+}
 
 // Helper methods
 private formatSkill(skill: string): string {
@@ -923,6 +1086,23 @@ private clearSkillInput(): void {
       });
     }
   }
+
+   /**
+   * Open the view application dialog
+   */
+  viewApplication(application: JobApplication): void {
+    this.selectedApplication = application;
+    this.showViewApplicationDialog = true;
+  }
+
+  /**
+   * Close the view application dialog
+   */
+  closeViewApplicationDialog(): void {
+    this.showViewApplicationDialog = false;
+    this.selectedApplication = null;
+  }
+
 
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach(key => {

@@ -316,6 +316,16 @@
           </td>
           <td>
             <div class="actions-cell">
+                 <p-button
+                icon="pi pi-eye"
+                severity="info"
+                size="small"
+                [outlined]="true"
+                pTooltip="View Application Details"
+                tooltipPosition="top"
+                (onClick)="viewApplication(application)"
+                class="mr-2">
+              </p-button>
               <p-button
                 *ngIf="canWithdrawApplication(application.status)"
                 icon="pi pi-times"
@@ -325,7 +335,8 @@
                 [outlined]="true"
                 pTooltip="Withdraw Application"
                 tooltipPosition="top"
-                (onClick)="confirmWithdrawApplication(application)">
+                (onClick)="confirmWithdrawApplication(application)"
+               >
               </p-button>
               <span *ngIf="!canWithdrawApplication(application.status)" class="no-action">
                 <i class="pi pi-lock text-gray-400"></i>
@@ -715,3 +726,12 @@
   <!-- Toast Messages -->
   <p-toast position="top-right"></p-toast>
 </div>
+<app-view-application
+  [(visible)]="showViewApplicationDialog"
+  [application]="selectedApplication"
+  [showStatusActions]="true"
+  (viewResume)="viewResume($event)"
+  (downloadResume)="downloadResume($event)"
+  (viewCoverLetter)="viewCoverLetter($event)"
+  (downloadCoverLetter)="downloadCoverLetter($event)">
+</app-view-application>
