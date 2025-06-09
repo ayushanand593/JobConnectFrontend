@@ -2,6 +2,40 @@
   (searchPerformed)="onSearchPerformed($event)">
 </app-job-search>
 
+<ng-container *ngIf="companies.length > 0">
+  <div class="company-list-header">
+    <h2>{{ companies.length | number }} Companies Found</h2>
+  </div>
+
+  <div class="companies-grid">
+    <p-card *ngFor="let c of companies" class="company-card">
+      <ng-template pTemplate="header">
+        <img
+          *ngIf="c.logoDataUrl; else initials"
+          [src]="c.logoDataUrl"
+          [alt]="c.companyName + ' logo'"
+          class="company-logo"
+        />
+        <ng-template #initials>
+          <div class="company-initials">
+            {{ getCompanyInitials(c.companyName) }}
+          </div>
+        </ng-template>
+      </ng-template>
+
+      <div class="company-content">
+        <h3>{{ c.companyName }}</h3>
+        <p class="meta">
+          <i class="pi pi-briefcase"></i> {{ c.industry }}
+          <span>&nbsp;|&nbsp;</span>
+          <i class="pi pi-users"></i> {{ c.size }}
+        </p>
+        <p class="desc">{{ c.description }}</p>
+      </div>
+    </p-card>
+  </div>
+</ng-container>
+
 <!-- job-list.component.html -->
 <div class="job-list-container">
   <!-- Header Section -->

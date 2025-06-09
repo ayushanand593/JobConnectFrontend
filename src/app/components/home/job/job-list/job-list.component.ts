@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CompanyWithMediaDto } from 'src/app/interfaces/CompanyWithMediaDto';
 import { Job } from 'src/app/interfaces/Job';
 import { JobSearchRequest } from 'src/app/interfaces/JobSearchRequest';
 import { PageResponse } from 'src/app/interfaces/PageResponse';
 import { AuthService } from 'src/app/services/auth-service.service';
+import { CompanyService } from 'src/app/services/company-service.service';
 import { JobService } from 'src/app/services/job.service';
 import { SavedJobService } from 'src/app/services/saved-job.service';
 
@@ -23,6 +25,9 @@ export class JobListComponent implements OnInit {
   // Search state
   isSearchMode: boolean = false;
   currentSearchRequest: JobSearchRequest = {};
+
+  // company 
+  companies: CompanyWithMediaDto[] = [];
   
   // Sort options
   sortOptions = [
@@ -41,6 +46,7 @@ export class JobListComponent implements OnInit {
   constructor(
     private jobSearchService: JobService, 
      private savedJobService: SavedJobService,
+     private companyService:CompanyService,
      private authService:AuthService,
     private router: Router,
     private route: ActivatedRoute
@@ -70,6 +76,16 @@ export class JobListComponent implements OnInit {
     this.isSearchMode = true;
     this.first = 0; // Reset pagination
     this.performSearch();
+      const name = searchRequest.companyName?.trim();
+  if (name) {
+    this.companyService.searchCompanies(name)
+      .subscribe({
+        next: list => this.companies = list,
+        error: () => this.companies = []
+      });
+  } else {
+    this.companies = [];
+  }
   }
 
   // Load all jobs (default view)
@@ -281,7 +297,7 @@ export class JobListComponent implements OnInit {
       relativeTo: this.route,
       queryParams: {},
     });
-
+this.companies = [];
     // Load all jobs again since we're no longer in search mode
     this.loadAllJobs();
   }

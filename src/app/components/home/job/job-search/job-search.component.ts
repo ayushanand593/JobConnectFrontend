@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { JobSearchRequest } from 'src/app/interfaces/JobSearchRequest';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { CompanyWithMediaDto } from 'src/app/interfaces/CompanyWithMediaDto';
 
 @Component({
   selector: 'app-job-search',
